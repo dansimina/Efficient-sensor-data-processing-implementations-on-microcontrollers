@@ -1,0 +1,68 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\Documents\\VisualStudio\\ArtificialHorizon\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{FDA736E4-8740-4FE0-8D03-92A0630A367D}|ArtificialHorizon\\ArtificialHorizon.csproj|d:\\documents\\visualstudio\\artificialhorizon\\artificialhorizon\\horizoncontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDA736E4-8740-4FE0-8D03-92A0630A367D}|ArtificialHorizon\\ArtificialHorizon.csproj|solutionrelative:artificialhorizon\\horizoncontrol.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDA736E4-8740-4FE0-8D03-92A0630A367D}|ArtificialHorizon\\ArtificialHorizon.csproj|D:\\Documents\\VisualStudio\\ArtificialHorizon\\artificialhorizon\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{FDA736E4-8740-4FE0-8D03-92A0630A367D}|ArtificialHorizon\\ArtificialHorizon.csproj|solutionrelative:artificialhorizon\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{FDA736E4-8740-4FE0-8D03-92A0630A367D}|ArtificialHorizon\\ArtificialHorizon.csproj|D:\\Documents\\VisualStudio\\ArtificialHorizon\\artificialhorizon\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{FDA736E4-8740-4FE0-8D03-92A0630A367D}|ArtificialHorizon\\ArtificialHorizon.csproj|solutionrelative:artificialhorizon\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "D:\\Documents\\VisualStudio\\ArtificialHorizon\\ArtificialHorizon\\Form1.cs",
+              "RelativeDocumentMoniker": "ArtificialHorizon\\Form1.cs",
+              "ToolTip": "D:\\Documents\\VisualStudio\\ArtificialHorizon\\ArtificialHorizon\\Form1.cs",
+              "RelativeToolTip": "ArtificialHorizon\\Form1.cs",
+              "ViewState": "AgIAACMAAAAAAAAAAAAgwCgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-19T10:24:17.163Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "HorizonControl.cs",
+              "DocumentMoniker": "D:\\Documents\\VisualStudio\\ArtificialHorizon\\ArtificialHorizon\\HorizonControl.cs",
+              "RelativeDocumentMoniker": "ArtificialHorizon\\HorizonControl.cs",
+              "ToolTip": "D:\\Documents\\VisualStudio\\ArtificialHorizon\\ArtificialHorizon\\HorizonControl.cs",
+              "RelativeToolTip": "ArtificialHorizon\\HorizonControl.cs",
+              "ViewState": "AgIAACEAAAAAAAAAAAAYwCEAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-19T11:49:31.888Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [Design]",
+              "DocumentMoniker": "D:\\Documents\\VisualStudio\\ArtificialHorizon\\ArtificialHorizon\\Form1.cs",
+              "RelativeDocumentMoniker": "ArtificialHorizon\\Form1.cs",
+              "ToolTip": "D:\\Documents\\VisualStudio\\ArtificialHorizon\\ArtificialHorizon\\Form1.cs [Design]",
+              "RelativeToolTip": "ArtificialHorizon\\Form1.cs [Design]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-10-19T10:21:53.019Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
