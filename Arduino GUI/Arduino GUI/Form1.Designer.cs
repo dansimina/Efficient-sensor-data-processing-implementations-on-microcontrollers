@@ -31,15 +31,14 @@
             this.components = new System.ComponentModel.Container();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.ConnectionPanel = new System.Windows.Forms.Panel();
+            this.buttonDisconnect = new System.Windows.Forms.Button();
+            this.buttonConnect = new System.Windows.Forms.Button();
+            this.comboBoxBaudRate = new System.Windows.Forms.ComboBox();
             this.label1 = new System.Windows.Forms.Label();
             this.comboBoxPort = new System.Windows.Forms.ComboBox();
             this.buttonScanPort = new System.Windows.Forms.Button();
-            this.comboBoxBaudRate = new System.Windows.Forms.ComboBox();
-            this.buttonConnect = new System.Windows.Forms.Button();
-            this.buttonDisconnect = new System.Windows.Forms.Button();
-            this.textBox = new System.Windows.Forms.TextBox();
             this.richTextBox = new System.Windows.Forms.RichTextBox();
-            this.buttonSend = new System.Windows.Forms.Button();
+            this.horizonPanel = new System.Windows.Forms.Panel();
             this.ConnectionPanel.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -56,40 +55,36 @@
             this.ConnectionPanel.Controls.Add(this.label1);
             this.ConnectionPanel.Controls.Add(this.comboBoxPort);
             this.ConnectionPanel.Controls.Add(this.buttonScanPort);
-            this.ConnectionPanel.Location = new System.Drawing.Point(12, 12);
+            this.ConnectionPanel.Location = new System.Drawing.Point(25, 12);
             this.ConnectionPanel.Name = "ConnectionPanel";
-            this.ConnectionPanel.Size = new System.Drawing.Size(310, 401);
+            this.ConnectionPanel.Size = new System.Drawing.Size(297, 401);
             this.ConnectionPanel.TabIndex = 0;
             // 
-            // label1
+            // buttonDisconnect
             // 
-            this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(34, 112);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(86, 20);
-            this.label1.TabIndex = 2;
-            this.label1.Text = "Baud Rate";
+            this.buttonDisconnect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonDisconnect.Location = new System.Drawing.Point(56, 328);
+            this.buttonDisconnect.Name = "buttonDisconnect";
+            this.buttonDisconnect.Size = new System.Drawing.Size(200, 50);
+            this.buttonDisconnect.TabIndex = 5;
+            this.buttonDisconnect.Text = "DISCONNECT";
+            this.buttonDisconnect.UseVisualStyleBackColor = true;
+            this.buttonDisconnect.Click += new System.EventHandler(this.buttonDisconnect_Click);
             // 
-            // comboBoxPort
+            // buttonConnect
             // 
-            this.comboBoxPort.FormattingEnabled = true;
-            this.comboBoxPort.Location = new System.Drawing.Point(158, 59);
-            this.comboBoxPort.Name = "comboBoxPort";
-            this.comboBoxPort.Size = new System.Drawing.Size(121, 28);
-            this.comboBoxPort.TabIndex = 1;
-            // 
-            // buttonScanPort
-            // 
-            this.buttonScanPort.Location = new System.Drawing.Point(26, 59);
-            this.buttonScanPort.Name = "buttonScanPort";
-            this.buttonScanPort.Size = new System.Drawing.Size(108, 28);
-            this.buttonScanPort.TabIndex = 0;
-            this.buttonScanPort.Text = "Scan Port";
-            this.buttonScanPort.UseVisualStyleBackColor = true;
-            this.buttonScanPort.Click += new System.EventHandler(this.buttonScanPort_Click);
+            this.buttonConnect.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonConnect.Location = new System.Drawing.Point(56, 263);
+            this.buttonConnect.Name = "buttonConnect";
+            this.buttonConnect.Size = new System.Drawing.Size(200, 50);
+            this.buttonConnect.TabIndex = 4;
+            this.buttonConnect.Text = "CONNECT";
+            this.buttonConnect.UseVisualStyleBackColor = true;
+            this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
             // 
             // comboBoxBaudRate
             // 
+            this.comboBoxBaudRate.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.comboBoxBaudRate.Items.AddRange(new object[] {
             "9600",
             "14400",
@@ -97,66 +92,68 @@
             "38400",
             "57600",
             "115200"});
-            this.comboBoxBaudRate.Location = new System.Drawing.Point(158, 112);
+            this.comboBoxBaudRate.Location = new System.Drawing.Point(56, 176);
             this.comboBoxBaudRate.Name = "comboBoxBaudRate";
-            this.comboBoxBaudRate.Size = new System.Drawing.Size(121, 28);
+            this.comboBoxBaudRate.Size = new System.Drawing.Size(200, 37);
             this.comboBoxBaudRate.TabIndex = 3;
             // 
-            // buttonConnect
+            // label1
             // 
-            this.buttonConnect.Location = new System.Drawing.Point(26, 181);
-            this.buttonConnect.Name = "buttonConnect";
-            this.buttonConnect.Size = new System.Drawing.Size(108, 30);
-            this.buttonConnect.TabIndex = 4;
-            this.buttonConnect.Text = "Connect";
-            this.buttonConnect.UseVisualStyleBackColor = true;
-            this.buttonConnect.Click += new System.EventHandler(this.buttonConnect_Click);
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.label1.Location = new System.Drawing.Point(92, 144);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(125, 29);
+            this.label1.TabIndex = 2;
+            this.label1.Text = "Baud Rate";
             // 
-            // buttonDisconnect
+            // comboBoxPort
             // 
-            this.buttonDisconnect.Location = new System.Drawing.Point(158, 181);
-            this.buttonDisconnect.Name = "buttonDisconnect";
-            this.buttonDisconnect.Size = new System.Drawing.Size(121, 30);
-            this.buttonDisconnect.TabIndex = 5;
-            this.buttonDisconnect.Text = "Disconnect";
-            this.buttonDisconnect.UseVisualStyleBackColor = true;
-            this.buttonDisconnect.Click += new System.EventHandler(this.buttonDisconnect_Click);
+            this.comboBoxPort.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.comboBoxPort.FormattingEnabled = true;
+            this.comboBoxPort.ItemHeight = 29;
+            this.comboBoxPort.Location = new System.Drawing.Point(56, 64);
+            this.comboBoxPort.Name = "comboBoxPort";
+            this.comboBoxPort.Size = new System.Drawing.Size(200, 37);
+            this.comboBoxPort.TabIndex = 1;
             // 
-            // textBox
+            // buttonScanPort
             // 
-            this.textBox.Location = new System.Drawing.Point(361, 12);
-            this.textBox.Name = "textBox";
-            this.textBox.Size = new System.Drawing.Size(290, 26);
-            this.textBox.TabIndex = 1;
+            this.buttonScanPort.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.buttonScanPort.Location = new System.Drawing.Point(56, 13);
+            this.buttonScanPort.Name = "buttonScanPort";
+            this.buttonScanPort.Size = new System.Drawing.Size(200, 45);
+            this.buttonScanPort.TabIndex = 0;
+            this.buttonScanPort.Text = "Scan Port";
+            this.buttonScanPort.UseVisualStyleBackColor = true;
+            this.buttonScanPort.Click += new System.EventHandler(this.buttonScanPort_Click);
             // 
             // richTextBox
             // 
-            this.richTextBox.Location = new System.Drawing.Point(361, 45);
+            this.richTextBox.Location = new System.Drawing.Point(361, 304);
             this.richTextBox.Name = "richTextBox";
-            this.richTextBox.Size = new System.Drawing.Size(407, 368);
+            this.richTextBox.Size = new System.Drawing.Size(407, 109);
             this.richTextBox.TabIndex = 2;
             this.richTextBox.Text = "";
             this.richTextBox.TextChanged += new System.EventHandler(this.richTextBox_TextChanged);
             // 
-            // buttonSend
+            // horizonPanel
             // 
-            this.buttonSend.Location = new System.Drawing.Point(658, 12);
-            this.buttonSend.Name = "buttonSend";
-            this.buttonSend.Size = new System.Drawing.Size(110, 27);
-            this.buttonSend.TabIndex = 3;
-            this.buttonSend.Text = "Send";
-            this.buttonSend.UseVisualStyleBackColor = true;
-            this.buttonSend.Click += new System.EventHandler(this.buttonSend_Click);
+            this.horizonPanel.Location = new System.Drawing.Point(361, 12);
+            this.horizonPanel.Name = "horizonPanel";
+            this.horizonPanel.Size = new System.Drawing.Size(407, 261);
+            this.horizonPanel.TabIndex = 3;
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.buttonSend);
+            this.Controls.Add(this.horizonPanel);
             this.Controls.Add(this.richTextBox);
-            this.Controls.Add(this.textBox);
             this.Controls.Add(this.ConnectionPanel);
+            this.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
             this.Name = "Form1";
             this.Text = "Form1";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.Form1_FormClosed);
@@ -164,7 +161,6 @@
             this.ConnectionPanel.ResumeLayout(false);
             this.ConnectionPanel.PerformLayout();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -178,9 +174,8 @@
         private System.Windows.Forms.ComboBox comboBoxBaudRate;
         private System.Windows.Forms.Button buttonDisconnect;
         private System.Windows.Forms.Button buttonConnect;
-        private System.Windows.Forms.TextBox textBox;
         private System.Windows.Forms.RichTextBox richTextBox;
-        private System.Windows.Forms.Button buttonSend;
+        private System.Windows.Forms.Panel horizonPanel;
     }
 }
 

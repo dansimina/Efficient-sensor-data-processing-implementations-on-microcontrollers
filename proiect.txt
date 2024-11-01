@@ -1,0 +1,57 @@
+de incarcat!!!
+
+de facut partea de analiza
+-descris toate operatiile
+-descris toti algoritmii
+
+de scris mai detaliat fix pe ce implementam noi
+
+un prim design
+-
+-definit input si output
+-schema bloc ceva diagrame
+
+evidentiat mai bine obiective
+numerotat documentatie
+descris mai bine la filtrare
+procesare online nu real time
+de vazut care e maximul pe care il putem tine in memorie pentru vector in Arduino
+
+
+----------------
+senzori + Arduino
+temperatura + umiditate 
+accelerometru + giroscop
+
+filtre
+medii
+histograme 
+deviatia standard
+
+datele vin in continuu cu o periodicitate prestabilita
+masurat timp de executie si cat ocupa programul cu variabilele
+dupa cautat metode de imbunatatire
+cum am putea face sa avem mai multe functii de procesare ca sa se execute in acelasi timp
+
+
+bibliografie:
+-autor
+-titlu
+-anul publicarii + ... pt carte
+-link plus data accesare link
+-datele tb referite in text
+
+in introducere:
+plecand de la tema aleasa tb sa ne gandim cum va fii proiectul
+scris specificatiile mai clare, cum va fii tema aleasa, cam asa va fii proiectul meu
+
+pe data viitoare:
+-de strans documentatie
+-de citit
+-de scris capitol de studiu bibliografic
+-partea de introducere
+-cum o sa ne impartim proiectul pe taskuri ca sa avem o idee de ce vom face de o data pe alta
+
+
+
+

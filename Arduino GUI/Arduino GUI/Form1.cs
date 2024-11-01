@@ -8,15 +8,25 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;
+using ArtificialHorizon;
 
 namespace Arduino_GUI
 {
     public partial class Form1 : Form
     {
+        private HorizonControl horizonControl;
         string serialDataIn;
+        string auxData;
         public Form1()
         {
             InitializeComponent();
+
+            horizonControl = new HorizonControl
+            {
+                Dock = DockStyle.Fill,
+                Pitch = 0 
+            };
+            horizonPanel.Controls.Add(horizonControl);
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -84,27 +94,31 @@ namespace Arduino_GUI
             }
         }
 
-        private void buttonSend_Click(object sender, EventArgs e)
-        {
-            try
-            {
-                serialPort1.Write(textBox.Text + "#");
-            }
-            catch (Exception error)
-            {
-                MessageBox.Show(error.Message);
-            }
-        }
-
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            serialDataIn = serialPort1.ReadExisting();
-            this.Invoke(new EventHandler(ShowData));
+            auxData += serialPort1.ReadExisting();
+            if (auxData[auxData.Length - 1] == '#')
+            {
+                serialDataIn = auxData;
+                auxData = "";
+                this.Invoke(new EventHandler(ShowData));
+            }
         }
 
         private void ShowData(object sender, EventArgs e)
         {
-            richTextBox.Text += serialDataIn;
+            string[] coord = serialDataIn.Split(' ');
+
+            if (coord.Length == 3)
+            {
+                double x = Convert.ToDouble(coord[0]) * 2;
+                double y = Convert.ToDouble(coord[1]) * 2;
+
+                horizonControl.Pitch = -x;
+                horizonControl.Tilt = -y;
+
+                richTextBox.Text += "x: " + coord[0] + " y: " + coord[1] + "\n";
+            }
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)
