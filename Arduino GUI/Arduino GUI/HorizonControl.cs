@@ -19,7 +19,6 @@ namespace ArtificialHorizon
             set
             {
                 pitch = value / 90.0;
-                
                 Invalidate(); // Redraw the control when the pitch changes
             }
         }
@@ -30,7 +29,6 @@ namespace ArtificialHorizon
             set
             {
                 tilt = (int)Math.Round(Math.Tan(value * Math.PI / 360) * (Width / 2.0));
-
                 Invalidate(); // Redraw the control when the roll changes
             }
         }

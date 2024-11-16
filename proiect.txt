@@ -1,5 +1,27 @@
 de incarcat!!!
 
+de facut sa functioneze ceva
+peste 4 sapt ar tb proiectul aproape finalizat
+scris ce am implementat
+facut update-uri in dumentatie
+
+implementare mai inceata, dar cu memorie mai putina / implementare mai rapida dar cu memorie mai multa
+
+varinate ca
+medie mobila
+calculul abaterii standard intr-o fereastra, metoda standard deviation wellford
+cata memorie consuma, timpul de executie masurat/estimat, daca stiu cate instr face se poate calc (estimat)
+scot mai bine in evidenta deviatia standard
+
+nu filtru medie mobila, ci doar medie mobila
+
+
+
+
+
+-de vorbit despre paralelism
+-de revizuit
+
 de facut partea de analiza
 -descris toate operatiile
 -descris toti algoritmii

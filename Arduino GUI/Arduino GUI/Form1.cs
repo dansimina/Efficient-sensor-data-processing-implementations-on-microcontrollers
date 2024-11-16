@@ -18,6 +18,7 @@ namespace Arduino_GUI
         private HorizonControl horizonControl;
         string serialDataIn;
         string auxData;
+
         public Form1()
         {
             InitializeComponent();
@@ -33,30 +34,25 @@ namespace Arduino_GUI
                 Pitch = 0 
             };
             horizonPanel.Controls.Add(horizonControl);
-
-            //chart1.
         }
 
         private void Chart1Control()
         {
+            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 17, 18, 19, 20 };
+            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
             Series series = new Series();
-            int[] valoriX = { 0, 1, 2, 3, 4, 5 };
-            int[] valoriY = { 0, 1, 3, -2, 2, -3 };
-
             series.ChartType = SeriesChartType.Spline;
-
-            series.Points.DataBindXY(valoriX, valoriY);
+            series.Points.DataBindXY(xAxis, yAxis);
             chart1.Series.Add(series);
 
             ChartArea chartArea = chart1.ChartAreas[0];
-
-            chartArea.AxisX.Minimum = 0;          // Valoarea minimă de pe axa X
-            chartArea.AxisX.Maximum = 10;          // Valoarea maximă de pe axa X
+            chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
+            chartArea.AxisX.Maximum = 20;          // Valoarea maximă de pe axa X
             chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
-
-            chartArea.AxisY.Minimum = -3;          // Valoarea minimă de pe axa Y
-            chartArea.AxisY.Maximum = 3;         // Valoarea maximă de pe axa Y
-            chartArea.AxisY.Interval = 1;
+            chartArea.AxisY.Minimum = -1;          // Valoarea minimă de pe axa Y
+            chartArea.AxisY.Maximum = 1;         // Valoarea maximă de pe axa Y
+            chartArea.AxisY.Interval = 0.2;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -131,11 +127,61 @@ namespace Arduino_GUI
             {
                 serialDataIn = auxData;
                 auxData = "";
-                this.Invoke(new EventHandler(ShowData));
+                String command = serialDataIn.Split(' ')[0];
+
+                switch (command)
+                {
+                    case "angles":
+                        serialDataIn = serialDataIn.Remove(0, 7);
+                        this.Invoke(new EventHandler(UpdateHorizon));
+                        break;
+                    case "zscorex":
+                        serialDataIn = serialDataIn.Remove(0, 8);
+                        this.Invoke(new EventHandler(UpdateZScoreX));
+                        break;
+
+                    case "zscorey":
+                        serialDataIn = serialDataIn.Remove(0, 8);
+                        this.Invoke(new EventHandler(UpdateZScoreY));
+                        break;
+                }
             }
         }
 
-        private void ShowData(object sender, EventArgs e)
+        private void UpdateZScoreY(object sender, EventArgs e)
+        {
+
+        }
+
+        private void UpdateZScoreX(object sender, EventArgs e)
+        {
+            try
+            {
+                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
+                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
+
+                var points = chart1.Series[1].Points;
+
+                if (values.Length != points.Count)
+                {
+                    Console.WriteLine("Mismatch between data length and chart points.");
+                    return;
+                }
+
+                for (var i = 0; i < points.Count; ++i)
+                {
+                    points[i].YValues[0] = values[i];
+                }
+
+                chart1.Invalidate();
+                
+            }
+            catch (Exception error)
+            {
+            }
+        }
+
+        private void UpdateHorizon(object sender, EventArgs e)
         {
             string[] coord = serialDataIn.Split(' ');
 
@@ -147,8 +193,8 @@ namespace Arduino_GUI
                 horizonControl.Pitch = -x;
                 horizonControl.Tilt = -y;
 
-                richTextBox.Text += "x: " + coord[0] + " y: " + coord[1] + "\n";
-            }
+                //richTextBox.Text += "x: " + coord[0] + " y: " + coord[1] + "\n";
+            }   
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)

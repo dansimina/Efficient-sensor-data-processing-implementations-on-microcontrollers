@@ -181,7 +181,7 @@
             series1.Legend = "Legend1";
             series1.Name = "Series1";
             this.chart1.Series.Add(series1);
-            this.chart1.Size = new System.Drawing.Size(760, 234);
+            this.chart1.Size = new System.Drawing.Size(875, 234);
             this.chart1.TabIndex = 4;
             title1.Name = "Title1";
             title1.Text = "Z-Score X";
@@ -218,7 +218,7 @@
             series3.Legend = "Legend1";
             series3.Name = "Series1";
             this.chart3.Series.Add(series3);
-            this.chart3.Size = new System.Drawing.Size(760, 234);
+            this.chart3.Size = new System.Drawing.Size(875, 234);
             this.chart3.TabIndex = 10;
             title2.Name = "Title1";
             title2.Text = "Z-Score Y";
@@ -238,7 +238,7 @@
             series4.Legend = "Legend1";
             series4.Name = "Series1";
             this.chart4.Series.Add(series4);
-            this.chart4.Size = new System.Drawing.Size(760, 234);
+            this.chart4.Size = new System.Drawing.Size(875, 234);
             this.chart4.TabIndex = 11;
             title3.Name = "Title1";
             title3.Text = "DISTANCE";
@@ -249,7 +249,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
-            this.ClientSize = new System.Drawing.Size(1593, 794);
+            this.ClientSize = new System.Drawing.Size(1695, 794);
             this.Controls.Add(this.chart4);
             this.Controls.Add(this.chart3);
             this.Controls.Add(this.chart2);
