@@ -26,7 +26,9 @@ namespace Arduino_GUI
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
-            Chart1Control();
+            InitializeChart1();
+            InitializeProgressBar();
+            
 
             horizonControl = new HorizonControl
             {
@@ -36,7 +38,15 @@ namespace Arduino_GUI
             horizonPanel.Controls.Add(horizonControl);
         }
 
-        private void Chart1Control()
+        private void InitializeProgressBar()
+        {
+            progressBarDistance.Style = ProgressBarStyle.Continuous;
+            progressBarDistance.Value = 0;
+            progressBarDistance.Minimum = 0;
+            progressBarDistance.Maximum = 100;
+        }
+
+        private void InitializeChart1()
         {
             int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 17, 18, 19, 20 };
             int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -144,6 +154,11 @@ namespace Arduino_GUI
                         serialDataIn = serialDataIn.Remove(0, 8);
                         this.Invoke(new EventHandler(UpdateZScoreY));
                         break;
+
+                    case "distance":
+                        serialDataIn = serialDataIn.Remove(0, 9);
+                        this.Invoke(new EventHandler(UpdateDistance));
+                        break;
                 }
             }
         }
@@ -181,6 +196,13 @@ namespace Arduino_GUI
             }
         }
 
+        private void UpdateDistance(object sender, EventArgs e)
+        {
+            string[] dist = serialDataIn.Split(' ');
+            int distance = (int)Convert.ToDouble(dist[0]);
+            progressBarDistance.Value = 100 - distance;
+        }
+
         private void UpdateHorizon(object sender, EventArgs e)
         {
             string[] coord = serialDataIn.Split(' ');
@@ -190,8 +212,8 @@ namespace Arduino_GUI
                 double x = Convert.ToDouble(coord[0]) * 2;
                 double y = Convert.ToDouble(coord[1]) * 2;
 
-                horizonControl.Pitch = -x;
-                horizonControl.Tilt = -y;
+                horizonControl.Pitch = -y;
+                horizonControl.Tilt = -x;
 
                 //richTextBox.Text += "x: " + coord[0] + " y: " + coord[1] + "\n";
             }   
