@@ -21,12 +21,14 @@ namespace Arduino_GUI
 
         public Form1()
         {
+            Console.WriteLine("START");
             InitializeComponent();
 
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
-            InitializeChart1();
+            InitializeChartScoreX();
+            InitializeChartScoreY();
             InitializeProgressBar();
             
 
@@ -46,19 +48,38 @@ namespace Arduino_GUI
             progressBarDistance.Maximum = 100;
         }
 
-        private void InitializeChart1()
+        private void InitializeChartScoreX()
         {
-            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 17, 18, 19, 20 };
-            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             Series series = new Series();
             series.ChartType = SeriesChartType.Spline;
             series.Points.DataBindXY(xAxis, yAxis);
-            chart1.Series.Add(series);
+            chartScoreX.Series.Add(series);
 
-            ChartArea chartArea = chart1.ChartAreas[0];
+            ChartArea chartArea = chartScoreX.ChartAreas[0];
             chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
-            chartArea.AxisX.Maximum = 20;          // Valoarea maximă de pe axa X
+            chartArea.AxisX.Maximum = 10;          // Valoarea maximă de pe axa X
+            chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
+            chartArea.AxisY.Minimum = -4;          // Valoarea minimă de pe axa Y
+            chartArea.AxisY.Maximum = 4;         // Valoarea maximă de pe axa Y
+            chartArea.AxisY.Interval = 0.5;
+        }
+
+        private void InitializeChartScoreY()
+        {
+            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+            Series series = new Series();
+            series.ChartType = SeriesChartType.Spline;
+            series.Points.DataBindXY(xAxis, yAxis);
+            chartScoreY.Series.Add(series);
+
+            ChartArea chartArea = chartScoreY.ChartAreas[0];
+            chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
+            chartArea.AxisX.Maximum = 10;          // Valoarea maximă de pe axa X
             chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
             chartArea.AxisY.Minimum = -4;          // Valoarea minimă de pe axa Y
             chartArea.AxisY.Maximum = 4;         // Valoarea maximă de pe axa Y
@@ -155,7 +176,7 @@ namespace Arduino_GUI
                         this.Invoke(new EventHandler(UpdateZScoreY));
                         break;
 
-                    case "distance":
+                    case "scored":
                         serialDataIn = serialDataIn.Remove(0, 9);
                         this.Invoke(new EventHandler(UpdateDistance));
                         break;
@@ -165,17 +186,12 @@ namespace Arduino_GUI
 
         private void UpdateZScoreY(object sender, EventArgs e)
         {
-
-        }
-
-        private void UpdateZScoreX(object sender, EventArgs e)
-        {
             try
             {
                 serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
                 float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
 
-                var points = chart1.Series[1].Points;
+                var points = chartScoreY.Series[1].Points;
 
                 if (values.Length != points.Count)
                 {
@@ -188,11 +204,63 @@ namespace Arduino_GUI
                     points[i].YValues[0] = values[i];
                 }
 
-                chart1.Invalidate();
-                
+                chartScoreY.Invalidate();
+
             }
             catch (Exception error)
             {
+            }
+        }
+
+        //private void UpdateZScoreX(object sender, EventArgs e)
+        //{
+        //    try
+        //    {
+        //        serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
+        //        double values = Convert.ToDouble(serialDataIn.Split(' ')[0]);
+
+        //        var points = chart1.Series[1].Points;
+
+        //        for (var i = 0; i < points.Count - 1; ++i)
+        //        {
+        //            points[i].YValues[0] = points[i + 1].YValues[0];
+        //        }
+        //        points[points.Count - 1].YValues[0] = values;
+
+        //        chart1.Invalidate();
+
+        //    }
+        //    catch (Exception error)
+        //    {
+        //    }
+        //}
+
+        private void UpdateZScoreX(object sender, EventArgs e)
+        {
+            try
+            {
+                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
+                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
+
+                var points = chartScoreX.Series[1].Points;
+
+                if (values.Length != points.Count)
+                {
+                    Console.WriteLine("Mismatch between data length and chart points.");
+                    return;
+                }
+
+                for (var i = 0; i < points.Count; ++i)
+                {
+                    points[i].YValues[0] = values[i];
+                }
+
+                chartScoreX.Invalidate();
+
+            }
+            catch (Exception error)
+            {
+                Console.WriteLine(serialDataIn);
             }
         }
 

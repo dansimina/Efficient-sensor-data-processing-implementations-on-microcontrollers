@@ -17,20 +17,19 @@ const float alpha = 0.90;
 float distance = 0.0;
 
 // PROGRAM
-#define N 20
+#define N 10
 
 float valuesX[N] = {0};
-float M2X[N] = {0};
 float varianceX = 0;
-float runningSumX = 0;
-int ptrX = 0;
 int nX = 0;
 
 float valuesY[N] = {0};
-float M2Y[N] = {0};
 float varianceY = 0;
-float runningSumY = 0;
-int ptrY = 0;
+int nY = 0;
+
+float valuesD[N] = {0};
+float varianceD = 0;
+int nD = 0;
 
 float result[N] = {0};
 
@@ -61,6 +60,9 @@ void loop() {
   calculateZScore(angleX, nX, valuesX, result);
   printZScore("x", result);
 
+  // calculateZScore(angleY, nY, valuesY, result);
+  // printZScore("y", result);
+
   // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
 
   delay(10);
@@ -73,6 +75,9 @@ void printZScore(String et, float score[N]) {
     ZScore += " ";
     ZScore += String(score[i]);
   }
+
+  // ZScore += " ";
+  // ZScore += String(score[N - 1]);
 
   ZScore += " #";
   Serial.print(ZScore);
