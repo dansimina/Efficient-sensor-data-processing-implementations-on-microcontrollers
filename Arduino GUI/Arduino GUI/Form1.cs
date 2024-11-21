@@ -21,21 +21,19 @@ namespace Arduino_GUI
 
         public Form1()
         {
-            Console.WriteLine("START");
             InitializeComponent();
 
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
-            InitializeChartScoreX();
-            InitializeChartScoreY();
+            InitializeChart1();
             InitializeProgressBar();
-
+            
 
             horizonControl = new HorizonControl
             {
                 Dock = DockStyle.Fill,
-                Pitch = 0
+                Pitch = 0 
             };
             horizonPanel.Controls.Add(horizonControl);
         }
@@ -48,42 +46,23 @@ namespace Arduino_GUI
             progressBarDistance.Maximum = 100;
         }
 
-        private void InitializeChartScoreX()
+        private void InitializeChart1()
         {
-            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 17, 18, 19, 20 };
+            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             Series series = new Series();
             series.ChartType = SeriesChartType.Spline;
             series.Points.DataBindXY(xAxis, yAxis);
-            chartScoreX.Series.Add(series);
+            chart1.Series.Add(series);
 
-            ChartArea chartArea = chartScoreX.ChartAreas[0];
+            ChartArea chartArea = chart1.ChartAreas[0];
             chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
-            chartArea.AxisX.Maximum = 10;          // Valoarea maximă de pe axa X
+            chartArea.AxisX.Maximum = 20;          // Valoarea maximă de pe axa X
             chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
             chartArea.AxisY.Minimum = -4;          // Valoarea minimă de pe axa Y
             chartArea.AxisY.Maximum = 4;         // Valoarea maximă de pe axa Y
-            chartArea.AxisY.Interval = 0.5;
-        }
-
-        private void InitializeChartScoreY()
-        {
-            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
-            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-
-            Series series = new Series();
-            series.ChartType = SeriesChartType.Spline;
-            series.Points.DataBindXY(xAxis, yAxis);
-            chartScoreY.Series.Add(series);
-
-            ChartArea chartArea = chartScoreY.ChartAreas[0];
-            chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
-            chartArea.AxisX.Maximum = 10;          // Valoarea maximă de pe axa X
-            chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
-            chartArea.AxisY.Minimum = -4;          // Valoarea minimă de pe axa Y
-            chartArea.AxisY.Maximum = 4;         // Valoarea maximă de pe axa Y
-            chartArea.AxisY.Interval = 0.5;
+            chartArea.AxisY.Interval = 1;
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -91,7 +70,7 @@ namespace Arduino_GUI
             buttonConnect.Enabled = true;
             buttonDisconnect.Enabled = false;
 
-            comboBoxBaudRate.Text = "9600";
+            comboBoxBaudRate.Text = "9600"; 
         }
 
         private void buttonScanPort_Click(object sender, EventArgs e)
@@ -112,7 +91,7 @@ namespace Arduino_GUI
                 buttonConnect.Enabled = false;
                 buttonDisconnect.Enabled = true;
             }
-            catch (Exception error)
+            catch(Exception error)
             {
                 MessageBox.Show(error.Message);
             }
@@ -121,7 +100,7 @@ namespace Arduino_GUI
 
         private void buttonDisconnect_Click(object sender, EventArgs e)
         {
-            if (serialPort1.IsOpen)
+            if(serialPort1.IsOpen)
             {
                 try
                 {
@@ -176,7 +155,7 @@ namespace Arduino_GUI
                         this.Invoke(new EventHandler(UpdateZScoreY));
                         break;
 
-                    case "scored":
+                    case "distance":
                         serialDataIn = serialDataIn.Remove(0, 9);
                         this.Invoke(new EventHandler(UpdateDistance));
                         break;
@@ -186,54 +165,8 @@ namespace Arduino_GUI
 
         private void UpdateZScoreY(object sender, EventArgs e)
         {
-            try
-            {
-                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
-                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
 
-                var points = chartScoreY.Series[1].Points;
-
-                if (values.Length != points.Count)
-                {
-                    Console.WriteLine("Mismatch between data length and chart points.");
-                    return;
-                }
-
-                for (var i = 0; i < points.Count; ++i)
-                {
-                    points[i].YValues[0] = values[i];
-                }
-
-                chartScoreY.Invalidate();
-
-            }
-            catch (Exception error)
-            {
-            }
         }
-
-        //private void UpdateZScoreX(object sender, EventArgs e)
-        //{
-        //    try
-        //    {
-        //        serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
-        //        double values = Convert.ToDouble(serialDataIn.Split(' ')[0]);
-
-        //        var points = chart1.Series[1].Points;
-
-        //        for (var i = 0; i < points.Count - 1; ++i)
-        //        {
-        //            points[i].YValues[0] = points[i + 1].YValues[0];
-        //        }
-        //        points[points.Count - 1].YValues[0] = values;
-
-        //        chart1.Invalidate();
-
-        //    }
-        //    catch (Exception error)
-        //    {
-        //    }
-        //}
 
         private void UpdateZScoreX(object sender, EventArgs e)
         {
@@ -242,7 +175,7 @@ namespace Arduino_GUI
                 serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
                 float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
 
-                var points = chartScoreX.Series[1].Points;
+                var points = chart1.Series[1].Points;
 
                 if (values.Length != points.Count)
                 {
@@ -255,12 +188,11 @@ namespace Arduino_GUI
                     points[i].YValues[0] = values[i];
                 }
 
-                chartScoreX.Invalidate();
-
+                chart1.Invalidate();
+                
             }
             catch (Exception error)
             {
-                Console.WriteLine(serialDataIn);
             }
         }
 
@@ -284,7 +216,7 @@ namespace Arduino_GUI
                 horizonControl.Tilt = -x;
 
                 //richTextBox.Text += "x: " + coord[0] + " y: " + coord[1] + "\n";
-            }
+            }   
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)

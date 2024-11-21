@@ -17,18 +17,20 @@ const float alpha = 0.90;
 float distance = 0.0;
 
 // PROGRAM
-#define N 10
+#define N 20
 
 float valuesX[N] = {0};
-float varianceX = 0;
 int nX = 0;
 
+// Welford
+int ptrX = N - 1;
+float meanX = 0.0;
+float M2nX = 0.0;
+
 float valuesY[N] = {0};
-float varianceY = 0;
 int nY = 0;
 
 float valuesD[N] = {0};
-float varianceD = 0;
 int nD = 0;
 
 float result[N] = {0};
@@ -58,26 +60,26 @@ void loop() {
   printDistance();
 
   calculateZScore(angleX, nX, valuesX, result);
-  printZScore("x", result);
+  printZScore("x", result, 0);
 
-  // calculateZScore(angleY, nY, valuesY, result);
-  // printZScore("y", result);
+  // calculateZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
+  // printZScore("x", result, ptrX);
 
   // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
 
   delay(20);
 }
 
-void printZScore(String et, float score[N]) {
+void printZScore(String et, float score[N], int start) {
   String ZScore = "zscore" + et;
 
-  // for(int i = 0; i < N; i++) {
-  //   ZScore += " ";
-  //   ZScore += String(score[i]);
-  // }
+  for(int i = 0, j = start; i < N; i++, j = (j + 1) % N) {
+    ZScore += " ";
+    ZScore += String(score[j]);
+  }
 
-  ZScore += " ";
-  ZScore += String(score[N - 1]);
+  // ZScore += " ";
+  // ZScore += String(score[N - 1]);
 
   ZScore += " #";
   Serial.print(ZScore);
@@ -107,7 +109,7 @@ void calculateZScore(float value, int& n, float values[N], float result[N]) {
     standardDeviation += (values[i] - mean) * (values[i] - mean);
   }
 
-  standardDeviation = sqrt(standardDeviation / n);
+  standardDeviation = sqrt(standardDeviation / (n - 1));
 
   for(int i = 0; i < n; i++) {
     if(standardDeviation != 0) {
@@ -119,41 +121,41 @@ void calculateZScore(float value, int& n, float values[N], float result[N]) {
   }
 }
 
-// void computeStandardDeviation(String et, float value, int& ptr, int& count, float& runningSum, float values[50], float M2[50]) {
-//   if(count < N) {
-//     count++;
-//   }
+void calculateZScoreWelford(float value, int& ptr, int& n, float& mean, float values[N], float& M2, float result[N]) {
+     if (n < N) {
+        values[ptr] = value;
+        n++;
+        float delta = value - mean;
+        mean += delta / n;
+        float delta2 = value - mean;
+        M2 += delta * delta2;
+      } 
+      else {
+        float oldValue = values[ptr];
+        values[ptr] = value;
 
-//   int next = (ptr + 1) % N;
-//   float oldMean = mean;
+        float deltaOld = oldValue - mean;
+        float delta = value - mean;
 
-//   runningSum = runningSum - values[next] + value;
-//   mean = runningSum / count;
+        mean -= deltaOld / N;
+        M2 -= deltaOld * (oldValue - mean);
 
-  
-//   M2[next] = M2[ptr] + (value - oldMean) * (value - mean);
-//   float variance = count > 1 ? sqrt(M2[next] / (count - 1)) : 0;
-
-//   values[next] = value;
-//   ptr = next;
-
-//   if(count == N) {
-//     String ZScore = "zscore" + et;
-
-//     for (int i = (ptr + 1) % N, j = 0; j < N; i = (i + 1) % N, j++) {
-//       float zi = 0.0;
-//       if(variance > 0) {
-//         zi = (values[i] - mean) / variance;
-//       }
-//       ZScore += " ";
-//       ZScore += String(zi);
-//     }
-
-//     ZScore += " #";
+        mean += delta / N;
+        float delta2 = value - mean;
+        M2 += delta * delta2;
+      }
+      ptr = (ptr + 1) % N;
     
-//     Serial.print(ZScore);
-//   }
-// }
+    float standardDeviation = sqrt(max(M2 / (n - 1), 0.0f)); 
+    
+    for(int i = 0; i < n; i++) {
+        if(standardDeviation > 0) {
+            result[i] = (values[i] - mean) / standardDeviation;
+        } else {
+            result[i] = 0;
+        }
+    }
+}
 
 void printDistance() {
   Serial.print("distance ");
