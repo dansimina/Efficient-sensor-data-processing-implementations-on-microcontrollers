@@ -24,13 +24,15 @@ float M2X[N] = {0};
 float varianceX = 0;
 float runningSumX = 0;
 int ptrX = 0;
-int countX = 0;
+int nX = 0;
 
 float valuesY[N] = {0};
 float M2Y[N] = {0};
 float varianceY = 0;
 float runningSumY = 0;
 int ptrY = 0;
+
+float result[N] = {0};
 
 void setup() {
   Wire.begin();
@@ -56,9 +58,60 @@ void loop() {
   readDistance();
   printDistance();
 
+  calculateZScore(angleX, nX, valuesX, result);
+  printZScore("x", result);
+
   // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
 
   delay(10);
+}
+
+void printZScore(String et, float score[N]) {
+  String ZScore = "zscore" + et;
+
+  for(int i = 0; i < N; i++) {
+    ZScore += " ";
+    ZScore += String(score[i]);
+  }
+
+  ZScore += " #";
+  Serial.print(ZScore);
+}
+
+void calculateZScore(float value, int& n, float values[N], float result[N]) {
+  if(n < N) {
+    values[n] = value;
+    n++;
+  }
+  else {
+    for(int i = 0; i < n - 1; i++) {
+      values[i] = values[i + 1];
+    }
+    values[n - 1] = value;
+  }
+
+
+  float mean = 0.0;
+  for(int i = 0; i < n; i++) {
+    mean += values[i];
+  }
+  mean /= n;
+
+  float standardDeviation = 0.0;
+  for(int i = 0; i < n; i++) {
+    standardDeviation += (values[i] - mean) * (values[i] - mean);
+  }
+
+  standardDeviation = sqrt(standardDeviation / n);
+
+  for(int i = 0; i < n; i++) {
+    if(standardDeviation != 0) {
+      result[i] = (values[i] - mean) / standardDeviation;
+    }
+    else {
+      result[i] = 0;
+    }
+  }
 }
 
 // void computeStandardDeviation(String et, float value, int& ptr, int& count, float& runningSum, float values[50], float M2[50]) {

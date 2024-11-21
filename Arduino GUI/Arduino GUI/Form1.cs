@@ -60,9 +60,9 @@ namespace Arduino_GUI
             chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
             chartArea.AxisX.Maximum = 20;          // Valoarea maximă de pe axa X
             chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
-            chartArea.AxisY.Minimum = -1;          // Valoarea minimă de pe axa Y
-            chartArea.AxisY.Maximum = 1;         // Valoarea maximă de pe axa Y
-            chartArea.AxisY.Interval = 0.2;
+            chartArea.AxisY.Minimum = -4;          // Valoarea minimă de pe axa Y
+            chartArea.AxisY.Maximum = 4;         // Valoarea maximă de pe axa Y
+            chartArea.AxisY.Interval = 0.5;
         }
 
         private void Form1_Load(object sender, EventArgs e)
