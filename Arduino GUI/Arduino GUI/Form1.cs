@@ -30,12 +30,12 @@ namespace Arduino_GUI
             InitializeChartScoreX();
             InitializeChartScoreY();
             InitializeProgressBar();
-            
+
 
             horizonControl = new HorizonControl
             {
                 Dock = DockStyle.Fill,
-                Pitch = 0 
+                Pitch = 0
             };
             horizonPanel.Controls.Add(horizonControl);
         }
@@ -50,7 +50,7 @@ namespace Arduino_GUI
 
         private void InitializeChartScoreX()
         {
-            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
             int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             Series series = new Series();
@@ -91,7 +91,7 @@ namespace Arduino_GUI
             buttonConnect.Enabled = true;
             buttonDisconnect.Enabled = false;
 
-            comboBoxBaudRate.Text = "9600"; 
+            comboBoxBaudRate.Text = "9600";
         }
 
         private void buttonScanPort_Click(object sender, EventArgs e)
@@ -112,7 +112,7 @@ namespace Arduino_GUI
                 buttonConnect.Enabled = false;
                 buttonDisconnect.Enabled = true;
             }
-            catch(Exception error)
+            catch (Exception error)
             {
                 MessageBox.Show(error.Message);
             }
@@ -121,7 +121,7 @@ namespace Arduino_GUI
 
         private void buttonDisconnect_Click(object sender, EventArgs e)
         {
-            if(serialPort1.IsOpen)
+            if (serialPort1.IsOpen)
             {
                 try
                 {
@@ -284,7 +284,7 @@ namespace Arduino_GUI
                 horizonControl.Tilt = -x;
 
                 //richTextBox.Text += "x: " + coord[0] + " y: " + coord[1] + "\n";
-            }   
+            }
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)

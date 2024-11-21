@@ -40,10 +40,6 @@
             System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
             System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
             System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.ConnectionPanel = new System.Windows.Forms.Panel();
             this.buttonDisconnect = new System.Windows.Forms.Button();
@@ -57,13 +53,12 @@
             this.chartScoreX = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chartScoreY = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart4 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.progressBarDistance = new System.Windows.Forms.ProgressBar();
+            this.chartPanel = new System.Windows.Forms.Panel();
             this.ConnectionPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.chartScoreX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartScoreY)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).BeginInit();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -225,26 +220,6 @@
             title2.Text = "Z-Score Y";
             this.chartScoreY.Titles.Add(title2);
             // 
-            // chart4
-            // 
-            chartArea4.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea4);
-            legend4.Enabled = false;
-            legend4.Name = "Legend1";
-            this.chart4.Legends.Add(legend4);
-            this.chart4.Location = new System.Drawing.Point(808, 541);
-            this.chart4.Name = "chart4";
-            series4.ChartArea = "ChartArea1";
-            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series4.Legend = "Legend1";
-            series4.Name = "Series1";
-            this.chart4.Series.Add(series4);
-            this.chart4.Size = new System.Drawing.Size(875, 234);
-            this.chart4.TabIndex = 11;
-            title3.Name = "Title1";
-            title3.Text = "DISTANCE";
-            this.chart4.Titles.Add(title3);
-            // 
             // progressBarDistance
             // 
             this.progressBarDistance.Location = new System.Drawing.Point(361, 292);
@@ -253,14 +228,21 @@
             this.progressBarDistance.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
             this.progressBarDistance.TabIndex = 12;
             // 
+            // chartPanel
+            // 
+            this.chartPanel.Location = new System.Drawing.Point(808, 534);
+            this.chartPanel.Name = "chartPanel";
+            this.chartPanel.Size = new System.Drawing.Size(875, 241);
+            this.chartPanel.TabIndex = 4;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(1695, 794);
+            this.Controls.Add(this.chartPanel);
             this.Controls.Add(this.progressBarDistance);
-            this.Controls.Add(this.chart4);
             this.Controls.Add(this.chartScoreY);
             this.Controls.Add(this.chart2);
             this.Controls.Add(this.chartScoreX);
@@ -278,7 +260,6 @@
             ((System.ComponentModel.ISupportInitialize)(this.chartScoreX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chartScoreY)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -298,8 +279,8 @@
         private System.Windows.Forms.DataVisualization.Charting.Chart chartScoreX;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
         private System.Windows.Forms.DataVisualization.Charting.Chart chartScoreY;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart4;
         private System.Windows.Forms.ProgressBar progressBarDistance;
+        private System.Windows.Forms.Panel chartPanel;
     }
 }
 

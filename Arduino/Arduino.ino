@@ -65,19 +65,19 @@ void loop() {
 
   // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
 
-  delay(10);
+  delay(20);
 }
 
 void printZScore(String et, float score[N]) {
   String ZScore = "zscore" + et;
 
-  for(int i = 0; i < N; i++) {
-    ZScore += " ";
-    ZScore += String(score[i]);
-  }
+  // for(int i = 0; i < N; i++) {
+  //   ZScore += " ";
+  //   ZScore += String(score[i]);
+  // }
 
-  // ZScore += " ";
-  // ZScore += String(score[N - 1]);
+  ZScore += " ";
+  ZScore += String(score[N - 1]);
 
   ZScore += " #";
   Serial.print(ZScore);
