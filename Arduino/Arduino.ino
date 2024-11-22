@@ -55,19 +55,23 @@ void setup() {
 void loop() {
   readAngles();
   printAngles();
+  delay(5);
 
   readDistance();
   printDistance();
+  delay(5);
 
-  calculateZScore(angleX, nX, valuesX, result);
-  printZScore("x", result, 0);
+  // calculateZScore(angleX, nX, valuesX, result);
+  // printZScore("x", result, 0);
+  // delay(10);
 
-  // calculateZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
-  // printZScore("x", result, ptrX);
+  calculateZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
+  printZScore("x", result, ptrX);
+  delay(10);
 
   // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
 
-  delay(20);
+  // delay(20);
 }
 
 void printZScore(String et, float score[N], int start) {

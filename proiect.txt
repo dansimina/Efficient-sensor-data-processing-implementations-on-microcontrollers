@@ -1,9 +1,18 @@
 de incarcat!!!
 
+incercat sa paralelizam, se face o paralelizare statica 4 thread-uri, cozi pentru valori, luam valori din coada
+masurat timp, memorie si comparat
+descris putin algoritmii in documentatie
+
+grija a paralelizare, s-ar putea sa se suprapuna citirea de pe senzori, le punem in coada si aia e
+periodicitatea tb sa fie mai mica decat timpul de rulare al functiei, ca dupa nu mai are sens
+
+
+
 de facut sa functioneze ceva
 peste 4 sapt ar tb proiectul aproape finalizat
 scris ce am implementat
-facut update-uri in dumentatie
+facut update-uri in documentatie
 
 implementare mai inceata, dar cu memorie mai putina / implementare mai rapida dar cu memorie mai multa
 
