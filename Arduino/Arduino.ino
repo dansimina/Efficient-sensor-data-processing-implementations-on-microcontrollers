@@ -30,9 +30,20 @@ float M2nX = 0.0;
 float valuesY[N] = {0};
 int nY = 0;
 
+// Welford
+int ptrY = N - 1;
+float meanY = 0.0;
+float M2nY = 0.0;
+
 float valuesD[N] = {0};
 int nD = 0;
 
+// Welford
+int ptrD = N - 1;
+float meanD = 0.0;
+float M2nD = 0.0;
+
+// Results
 float result[N] = {0};
 
 void setup() {
@@ -55,11 +66,11 @@ void setup() {
 void loop() {
   readAngles();
   printAngles();
-  delay(5);
+  delay(3);
 
   readDistance();
   printDistance();
-  delay(5);
+  delay(3);
 
   // calculateZScore(angleX, nX, valuesX, result);
   // printZScore("x", result, 0);
@@ -67,7 +78,15 @@ void loop() {
 
   calculateZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
   printZScore("x", result, ptrX);
-  delay(10);
+  delay(7);
+
+  calculateZScoreWelford(angleY, ptrY, nY, meanY, valuesY, M2nY, result);
+  printZScore("y", result, ptrY);
+  delay(7);
+
+  calculateZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
+  printZScore("d", result, ptrD);
+  delay(7);
 
   // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
 

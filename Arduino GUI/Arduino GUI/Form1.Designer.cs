@@ -29,21 +29,21 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea9 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend9 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series9 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title7 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea10 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend10 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series10 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea11 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend11 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series11 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title8 = new System.Windows.Forms.DataVisualization.Charting.Title();
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea12 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend12 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series12 = new System.Windows.Forms.DataVisualization.Charting.Series();
-            System.Windows.Forms.DataVisualization.Charting.Title title9 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title1 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea3 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend3 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series3 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title2 = new System.Windows.Forms.DataVisualization.Charting.Title();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea4 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend4 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series4 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.Title title3 = new System.Windows.Forms.DataVisualization.Charting.Title();
             this.serialPort1 = new System.IO.Ports.SerialPort(this.components);
             this.ConnectionPanel = new System.Windows.Forms.Panel();
             this.buttonDisconnect = new System.Windows.Forms.Button();
@@ -54,16 +54,16 @@
             this.buttonScanPort = new System.Windows.Forms.Button();
             this.richTextBox = new System.Windows.Forms.RichTextBox();
             this.horizonPanel = new System.Windows.Forms.Panel();
-            this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartZScoreX = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.chart2 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart3 = new System.Windows.Forms.DataVisualization.Charting.Chart();
-            this.chart4 = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartZScoreY = new System.Windows.Forms.DataVisualization.Charting.Chart();
+            this.chartZScoreD = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.progressBarDistance = new System.Windows.Forms.ProgressBar();
             this.ConnectionPanel.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartZScoreX)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartZScoreY)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartZScoreD)).BeginInit();
             this.SuspendLayout();
             // 
             // serialPort1
@@ -168,82 +168,82 @@
             this.horizonPanel.Size = new System.Drawing.Size(407, 274);
             this.horizonPanel.TabIndex = 3;
             // 
-            // chart1
+            // chartZScoreX
             // 
-            chartArea9.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea9);
-            legend9.Enabled = false;
-            legend9.Name = "Legend1";
-            this.chart1.Legends.Add(legend9);
-            this.chart1.Location = new System.Drawing.Point(808, 12);
-            this.chart1.Name = "chart1";
-            series9.ChartArea = "ChartArea1";
-            series9.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
-            series9.Legend = "Legend1";
-            series9.Name = "Series1";
-            this.chart1.Series.Add(series9);
-            this.chart1.Size = new System.Drawing.Size(875, 234);
-            this.chart1.TabIndex = 4;
-            title7.Name = "Title1";
-            title7.Text = "Z-Score X";
-            this.chart1.Titles.Add(title7);
-            this.chart1.Click += new System.EventHandler(this.chart1_Click);
+            chartArea1.Name = "ChartArea1";
+            this.chartZScoreX.ChartAreas.Add(chartArea1);
+            legend1.Enabled = false;
+            legend1.Name = "Legend1";
+            this.chartZScoreX.Legends.Add(legend1);
+            this.chartZScoreX.Location = new System.Drawing.Point(808, 12);
+            this.chartZScoreX.Name = "chartZScoreX";
+            series1.ChartArea = "ChartArea1";
+            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Line;
+            series1.Legend = "Legend1";
+            series1.Name = "Series1";
+            this.chartZScoreX.Series.Add(series1);
+            this.chartZScoreX.Size = new System.Drawing.Size(875, 234);
+            this.chartZScoreX.TabIndex = 4;
+            title1.Name = "Title1";
+            title1.Text = "Z-Score X";
+            this.chartZScoreX.Titles.Add(title1);
+            this.chartZScoreX.Click += new System.EventHandler(this.chart1_Click);
             // 
             // chart2
             // 
-            chartArea10.Name = "ChartArea1";
-            this.chart2.ChartAreas.Add(chartArea10);
-            legend10.Name = "Legend1";
-            this.chart2.Legends.Add(legend10);
+            chartArea2.Name = "ChartArea1";
+            this.chart2.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart2.Legends.Add(legend2);
             this.chart2.Location = new System.Drawing.Point(1176, 238);
             this.chart2.Name = "chart2";
-            series10.ChartArea = "ChartArea1";
-            series10.Legend = "Legend1";
-            series10.Name = "Series1";
-            this.chart2.Series.Add(series10);
+            series2.ChartArea = "ChartArea1";
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chart2.Series.Add(series2);
             this.chart2.Size = new System.Drawing.Size(8, 8);
             this.chart2.TabIndex = 5;
             this.chart2.Text = "chart2";
             // 
-            // chart3
+            // chartZScoreY
             // 
-            chartArea11.Name = "ChartArea1";
-            this.chart3.ChartAreas.Add(chartArea11);
-            legend11.Enabled = false;
-            legend11.Name = "Legend1";
-            this.chart3.Legends.Add(legend11);
-            this.chart3.Location = new System.Drawing.Point(808, 275);
-            this.chart3.Name = "chart3";
-            series11.ChartArea = "ChartArea1";
-            series11.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series11.Legend = "Legend1";
-            series11.Name = "Series1";
-            this.chart3.Series.Add(series11);
-            this.chart3.Size = new System.Drawing.Size(875, 234);
-            this.chart3.TabIndex = 10;
-            title8.Name = "Title1";
-            title8.Text = "Z-Score Y";
-            this.chart3.Titles.Add(title8);
+            chartArea3.Name = "ChartArea1";
+            this.chartZScoreY.ChartAreas.Add(chartArea3);
+            legend3.Enabled = false;
+            legend3.Name = "Legend1";
+            this.chartZScoreY.Legends.Add(legend3);
+            this.chartZScoreY.Location = new System.Drawing.Point(808, 275);
+            this.chartZScoreY.Name = "chartZScoreY";
+            series3.ChartArea = "ChartArea1";
+            series3.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series3.Legend = "Legend1";
+            series3.Name = "Series1";
+            this.chartZScoreY.Series.Add(series3);
+            this.chartZScoreY.Size = new System.Drawing.Size(875, 234);
+            this.chartZScoreY.TabIndex = 10;
+            title2.Name = "Title1";
+            title2.Text = "Z-Score Y";
+            this.chartZScoreY.Titles.Add(title2);
             // 
-            // chart4
+            // chartZScoreD
             // 
-            chartArea12.Name = "ChartArea1";
-            this.chart4.ChartAreas.Add(chartArea12);
-            legend12.Enabled = false;
-            legend12.Name = "Legend1";
-            this.chart4.Legends.Add(legend12);
-            this.chart4.Location = new System.Drawing.Point(808, 541);
-            this.chart4.Name = "chart4";
-            series12.ChartArea = "ChartArea1";
-            series12.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series12.Legend = "Legend1";
-            series12.Name = "Series1";
-            this.chart4.Series.Add(series12);
-            this.chart4.Size = new System.Drawing.Size(875, 234);
-            this.chart4.TabIndex = 11;
-            title9.Name = "Title1";
-            title9.Text = "DISTANCE";
-            this.chart4.Titles.Add(title9);
+            chartArea4.Name = "ChartArea1";
+            this.chartZScoreD.ChartAreas.Add(chartArea4);
+            legend4.Enabled = false;
+            legend4.Name = "Legend1";
+            this.chartZScoreD.Legends.Add(legend4);
+            this.chartZScoreD.Location = new System.Drawing.Point(808, 541);
+            this.chartZScoreD.Name = "chartZScoreD";
+            series4.ChartArea = "ChartArea1";
+            series4.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series4.Legend = "Legend1";
+            series4.Name = "Series1";
+            this.chartZScoreD.Series.Add(series4);
+            this.chartZScoreD.Size = new System.Drawing.Size(875, 234);
+            this.chartZScoreD.TabIndex = 11;
+            title3.Name = "Title1";
+            title3.Text = "DISTANCE";
+            this.chartZScoreD.Titles.Add(title3);
             // 
             // progressBarDistance
             // 
@@ -260,10 +260,10 @@
             this.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.ClientSize = new System.Drawing.Size(1695, 794);
             this.Controls.Add(this.progressBarDistance);
-            this.Controls.Add(this.chart4);
-            this.Controls.Add(this.chart3);
+            this.Controls.Add(this.chartZScoreD);
+            this.Controls.Add(this.chartZScoreY);
             this.Controls.Add(this.chart2);
-            this.Controls.Add(this.chart1);
+            this.Controls.Add(this.chartZScoreX);
             this.Controls.Add(this.horizonPanel);
             this.Controls.Add(this.richTextBox);
             this.Controls.Add(this.ConnectionPanel);
@@ -275,10 +275,10 @@
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ConnectionPanel.ResumeLayout(false);
             this.ConnectionPanel.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartZScoreX)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.chart2)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart3)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.chart4)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartZScoreY)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.chartZScoreD)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -295,10 +295,10 @@
         private System.Windows.Forms.Button buttonConnect;
         private System.Windows.Forms.RichTextBox richTextBox;
         private System.Windows.Forms.Panel horizonPanel;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart1;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartZScoreX;
         private System.Windows.Forms.DataVisualization.Charting.Chart chart2;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart3;
-        private System.Windows.Forms.DataVisualization.Charting.Chart chart4;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartZScoreY;
+        private System.Windows.Forms.DataVisualization.Charting.Chart chartZScoreD;
         private System.Windows.Forms.ProgressBar progressBarDistance;
     }
 }

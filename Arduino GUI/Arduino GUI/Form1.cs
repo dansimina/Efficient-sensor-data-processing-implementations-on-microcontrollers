@@ -26,14 +26,19 @@ namespace Arduino_GUI
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
-            InitializeChart1();
+            InitializeHorizonControl();
             InitializeProgressBar();
-            
+            InitializeChart(chartZScoreX);
+            InitializeChart(chartZScoreY);
+            InitializeChart(chartZScoreD);
+        }
 
+        private void InitializeHorizonControl()
+        {
             horizonControl = new HorizonControl
             {
                 Dock = DockStyle.Fill,
-                Pitch = 0 
+                Pitch = 0
             };
             horizonPanel.Controls.Add(horizonControl);
         }
@@ -46,7 +51,7 @@ namespace Arduino_GUI
             progressBarDistance.Maximum = 100;
         }
 
-        private void InitializeChart1()
+        private void InitializeChart(Chart chart)
         {
             int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 17, 18, 19, 20 };
             int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
@@ -54,9 +59,9 @@ namespace Arduino_GUI
             Series series = new Series();
             series.ChartType = SeriesChartType.Spline;
             series.Points.DataBindXY(xAxis, yAxis);
-            chart1.Series.Add(series);
+            chart.Series.Add(series);
 
-            ChartArea chartArea = chart1.ChartAreas[0];
+            ChartArea chartArea = chart.ChartAreas[0];
             chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
             chartArea.AxisX.Maximum = 20;          // Valoarea maximă de pe axa X
             chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
@@ -159,13 +164,13 @@ namespace Arduino_GUI
                         serialDataIn = serialDataIn.Remove(0, 9);
                         this.Invoke(new EventHandler(UpdateDistance));
                         break;
+
+                    case "zscored":
+                        serialDataIn = serialDataIn.Remove(0, 8);
+                        this.Invoke(new EventHandler(UpdateZScoreD));
+                        break;
                 }
             }
-        }
-
-        private void UpdateZScoreY(object sender, EventArgs e)
-        {
-
         }
 
         private void UpdateZScoreX(object sender, EventArgs e)
@@ -175,7 +180,7 @@ namespace Arduino_GUI
                 serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
                 float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
 
-                var points = chart1.Series[1].Points;
+                var points = chartZScoreX.Series[1].Points;
 
                 if (values.Length != points.Count)
                 {
@@ -188,8 +193,64 @@ namespace Arduino_GUI
                     points[i].YValues[0] = values[i];
                 }
 
-                chart1.Invalidate();
+                chartZScoreX.Invalidate();
                 
+            }
+            catch (Exception error)
+            {
+            }
+        }
+
+        private void UpdateZScoreY(object sender, EventArgs e)
+        {
+            try
+            {
+                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
+                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
+
+                var points = chartZScoreY.Series[1].Points;
+
+                if (values.Length != points.Count)
+                {
+                    Console.WriteLine("Mismatch between data length and chart points.");
+                    return;
+                }
+
+                for (var i = 0; i < points.Count; ++i)
+                {
+                    points[i].YValues[0] = values[i];
+                }
+
+                chartZScoreY.Invalidate();
+
+            }
+            catch (Exception error)
+            {
+            }
+        }
+
+        private void UpdateZScoreD(object sender, EventArgs e)
+        {
+            try
+            {
+                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
+                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
+
+                var points = chartZScoreD.Series[1].Points;
+
+                if (values.Length != points.Count)
+                {
+                    Console.WriteLine("Mismatch between data length and chart points.");
+                    return;
+                }
+
+                for (var i = 0; i < points.Count; ++i)
+                {
+                    points[i].YValues[0] = values[i];
+                }
+
+                chartZScoreD.Invalidate();
+
             }
             catch (Exception error)
             {
