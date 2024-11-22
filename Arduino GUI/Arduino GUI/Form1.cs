@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Ports;
 using ArtificialHorizon;
@@ -275,8 +268,6 @@ namespace Arduino_GUI
 
                 horizonControl.Pitch = -y;
                 horizonControl.Tilt = -x;
-
-                //richTextBox.Text += "x: " + coord[0] + " y: " + coord[1] + "\n";
             }   
         }
 
@@ -284,11 +275,6 @@ namespace Arduino_GUI
         {
             richTextBox.SelectionStart = richTextBox.Text.Length;
             richTextBox.ScrollToCaret();
-        }
-
-        private void chart1_Click(object sender, EventArgs e)
-        {
-
         }
     }
 }

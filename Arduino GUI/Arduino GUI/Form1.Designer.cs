@@ -187,7 +187,6 @@
             title1.Name = "Title1";
             title1.Text = "Z-Score X";
             this.chartZScoreX.Titles.Add(title1);
-            this.chartZScoreX.Click += new System.EventHandler(this.chart1_Click);
             // 
             // chart2
             // 
