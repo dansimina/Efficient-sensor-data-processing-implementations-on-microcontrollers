@@ -19,7 +19,7 @@ float distance = 0.0;
 // PROGRAM
 #define N 20
 
-float valuesX[N] = {0};
+float valuesX[N] = { 0 };
 int nX = 0;
 
 // Welford
@@ -27,7 +27,7 @@ int ptrX = N - 1;
 float meanX = 0.0;
 float M2nX = 0.0;
 
-float valuesY[N] = {0};
+float valuesY[N] = { 0 };
 int nY = 0;
 
 // Welford
@@ -35,7 +35,7 @@ int ptrY = N - 1;
 float meanY = 0.0;
 float M2nY = 0.0;
 
-float valuesD[N] = {0};
+float valuesD[N] = { 0 };
 int nD = 0;
 
 // Welford
@@ -44,7 +44,54 @@ float meanD = 0.0;
 float M2nD = 0.0;
 
 // Results
-float result[N] = {0};
+float result[N] = { 0 };
+
+// Multitasking
+#define NO_OF_TASKS 5
+typedef struct {
+  void (*taskFunction)();
+  unsigned long lastRunTime;
+  unsigned long interval;
+} Task;
+
+Task task[NO_OF_TASKS];
+unsigned long systemTime;
+
+#define BUFFER_SIZE 10
+float bufferAngleX[BUFFER_SIZE]{};
+int headBufferAngleX = 0;
+int tailBufferAngleX = 0;
+float bufferAngleY[BUFFER_SIZE]{};
+int headBufferAngleY = 0;
+int tailBufferAngleY = 0;
+float bufferDistance[BUFFER_SIZE]{};
+int headBufferDistance = 0;
+int tailBufferDistance = 0;
+
+void task1() {
+  readAngles();
+  printAngles();
+}
+
+void task2() {
+  readDistance();
+  printDistance();
+}
+
+void task3() {
+  computeZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
+  printZScore("x", result, ptrX);
+}
+
+void task4() {
+  computeZScoreWelford(angleY, ptrY, nY, meanY, valuesY, M2nY, result);
+  printZScore("y", result, ptrY);
+}
+
+void task5() {
+  computeZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
+  printZScore("d", result, ptrD);
+}
 
 void setup() {
   Wire.begin();
@@ -56,62 +103,61 @@ void setup() {
   Wire.write(0);           // Scoate senzorul din modul sleep
   Wire.endTransmission(true);
 
-  // Seteaz
+  // Seteaza pinii pentru HC-SR04
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
 
   lastTime = millis();  // Setează timpul initial
+
+  // Creaza task-urile
+  task[0] = { task1, lastTime, 4 };
+  task[1] = { task2, lastTime, 4 };
+  task[2] = { task3, lastTime, 8 };
+  task[3] = { task4, lastTime, 8 };
+  task[4] = { task5, lastTime, 8 };
 }
 
 void loop() {
-  readAngles();
-  printAngles();
-  delay(5);
+  systemTime = millis();
+  unsigned long longestWaitingPeriod = 0;
+  Task* currentTask = nullptr;
+  int taskEt = -1;
 
-  readDistance();
-  printDistance();
-  delay(5);
+  for (int i = 0; i < NO_OF_TASKS; i++) {
+    unsigned long waitingPeriod = systemTime - task[i].lastRunTime;
 
-  // computeZScore(angleX, nX, valuesX, result);
-  // printZScore("x", result, 0);
-  // delay(10);
+    if (waitingPeriod >= task[i].interval && waitingPeriod > longestWaitingPeriod) {
+      currentTask = &task[i];
+      longestWaitingPeriod = waitingPeriod;
+      taskEt = i;
+    }
+  }
 
-  computeZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
-  printZScore("x", result, ptrX);
-  delay(7);
-
-  computeZScoreWelford(angleY, ptrY, nY, meanY, valuesY, M2nY, result);
-  printZScore("y", result, ptrY);
-  delay(7);
-
-  computeZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
-  printZScore("d", result, ptrD);
-  delay(7);
-
-  // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
-
-  // delay(20);
+  if (currentTask != nullptr) {
+    currentTask->taskFunction();
+    currentTask->lastRunTime = systemTime;
+  }
 }
 
 void printZScore(String et, float score[N], int start) {
   String ZScore = "zscore" + et;
 
-  for(int i = 0, j = start; i < N; i++, j = (j + 1) % N) {
+  for (int i = 0, j = start; i < N; i++, j = (j + 1) % N) {
     ZScore += " ";
     ZScore += String(score[j]);
   }
 
   ZScore += " #";
   Serial.print(ZScore);
+  delay(5);
 }
 
 void computeZScore(float value, int& n, float values[N], float result[N]) {
-  if(n < N) {
+  if (n < N) {
     values[n] = value;
     n++;
-  }
-  else {
-    for(int i = 0; i < n - 1; i++) {
+  } else {
+    for (int i = 0; i < n - 1; i++) {
       values[i] = values[i + 1];
     }
     values[n - 1] = value;
@@ -119,68 +165,67 @@ void computeZScore(float value, int& n, float values[N], float result[N]) {
 
 
   float mean = 0.0;
-  for(int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     mean += values[i];
   }
   mean /= n;
 
   float standardDeviation = 0.0;
-  for(int i = 0; i < n; i++) {
+  for (int i = 0; i < n; i++) {
     standardDeviation += (values[i] - mean) * (values[i] - mean);
   }
 
   standardDeviation = sqrt(standardDeviation / (n - 1));
 
-  for(int i = 0; i < n; i++) {
-    if(standardDeviation != 0) {
+  for (int i = 0; i < n; i++) {
+    if (standardDeviation != 0) {
       result[i] = (values[i] - mean) / standardDeviation;
-    }
-    else {
+    } else {
       result[i] = 0;
     }
   }
 }
 
 void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float values[N], float& M2, float result[N]) {
-     if (n < N) {
-        values[ptr] = value;
-        n++;
-        float delta = value - mean;
-        mean += delta / n;
-        float delta2 = value - mean;
-        M2 += delta * delta2;
-      } 
-      else {
-        float oldValue = values[ptr];
-        values[ptr] = value;
+  if (n < N) {
+    values[ptr] = value;
+    n++;
+    float delta = value - mean;
+    mean += delta / n;
+    float delta2 = value - mean;
+    M2 += delta * delta2;
+  } else {
+    float oldValue = values[ptr];
+    values[ptr] = value;
 
-        float deltaOld = oldValue - mean;
-        float delta = value - mean;
+    float deltaOld = oldValue - mean;
+    float delta = value - mean;
 
-        mean -= deltaOld / N;
-        M2 -= deltaOld * (oldValue - mean);
+    mean -= deltaOld / N;
+    M2 -= deltaOld * (oldValue - mean);
 
-        mean += delta / N;
-        float delta2 = value - mean;
-        M2 += delta * delta2;
-      }
-      ptr = (ptr + 1) % N;
-    
-    float standardDeviation = sqrt(max(M2 / (n - 1), 0.0f)); 
-    
-    for(int i = 0; i < n; i++) {
-        if(standardDeviation > 0) {
-            result[i] = (values[i] - mean) / standardDeviation;
-        } else {
-            result[i] = 0;
-        }
+    mean += delta / N;
+    float delta2 = value - mean;
+    M2 += delta * delta2;
+  }
+  ptr = (ptr + 1) % N;
+
+  float standardDeviation = sqrt(max(M2 / (n - 1), 0.0f));
+
+  for (int i = 0; i < n; i++) {
+    if (standardDeviation > 0) {
+      result[i] = (values[i] - mean) / standardDeviation;
+    } else {
+      result[i] = 0;
     }
+  }
 }
 
 void printDistance() {
   Serial.print("distance ");
   Serial.print(distance);
   Serial.print(" #");
+  delay(3);
 }
 
 void readDistance() {
@@ -192,7 +237,7 @@ void readDistance() {
 
   float duration = pulseIn(ECHO_PIN, HIGH);
   // Viteza = Distanta / Timp => Distanta = Viteza * timp, se imparte la doi pentru ca e durata dus intors
-  distance = min((duration * 0.0343)/2, 100.0);
+  distance = min((duration * 0.0343) / 2, 100.0);
 }
 
 void printAngles() {
@@ -201,6 +246,7 @@ void printAngles() {
   Serial.print(" ");
   Serial.print(angleY);
   Serial.print(" #");
+  delay(3);
 }
 
 void readAngles() {
@@ -238,7 +284,7 @@ void readAngles() {
 
   angleX = alpha * (angleX) + (1 - alpha) * accAngleX;
   angleY = alpha * (angleY) + (1 - alpha) * accAngleY;
-  
+
   angleX = max(angleX, -89.0);
   angleX = min(angleX, 89.0);
   angleY = max(angleY, -89.0);

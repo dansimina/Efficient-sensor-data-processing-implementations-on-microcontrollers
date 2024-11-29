@@ -162,6 +162,13 @@ namespace Arduino_GUI
                         serialDataIn = serialDataIn.Remove(0, 8);
                         this.Invoke(new EventHandler(UpdateZScoreD));
                         break;
+                    case "task":
+                        richTextBox.Text += serialDataIn + "\n";
+                        if(richTextBox.Text.Length > 100)
+                        {
+                            richTextBox.Text = "";
+                        }
+                        break;
                 }
             }
         }

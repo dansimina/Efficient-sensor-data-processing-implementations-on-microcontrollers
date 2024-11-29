@@ -1,2 +1,4 @@
 https://projecthub.arduino.cc/adamb314/how-to-run-57-hard-real-time-threads-on-an-arduino-uno-6ee253
 https://www.youtube.com/watch?v=59oS82EKz9w
+https://www.youtube.com/watch?v=C4TKgULwpg8
+https://www.youtube.com/watch?v=SXZkX3cJqDs

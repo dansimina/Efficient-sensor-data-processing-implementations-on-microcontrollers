@@ -4,7 +4,7 @@ incercat sa paralelizam, se face o paralelizare statica 4 thread-uri, cozi pentr
 masurat timp, memorie si comparat
 descris putin algoritmii in documentatie
 
-grija a paralelizare, s-ar putea sa se suprapuna citirea de pe senzori, le punem in coada si aia e
+grija la paralelizare, s-ar putea sa se suprapuna citirea de pe senzori, le punem in coada si aia e
 periodicitatea tb sa fie mai mica decat timpul de rulare al functiei, ca dupa nu mai are sens
 
 
