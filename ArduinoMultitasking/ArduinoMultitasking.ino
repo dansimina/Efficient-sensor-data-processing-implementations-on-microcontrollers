@@ -110,11 +110,11 @@ void setup() {
   lastTime = millis();  // Setează timpul initial
 
   // Creaza task-urile
-  task[0] = { task1, lastTime, 4 };
-  task[1] = { task2, lastTime, 4 };
-  task[2] = { task3, lastTime, 8 };
-  task[3] = { task4, lastTime, 8 };
-  task[4] = { task5, lastTime, 8 };
+  task[0] = { task1, lastTime, 3 };
+  task[1] = { task2, lastTime, 3 };
+  task[2] = { task3, lastTime, 7 };
+  task[3] = { task4, lastTime, 7 };
+  task[4] = { task5, lastTime, 7 };
 }
 
 void loop() {
@@ -136,6 +136,10 @@ void loop() {
   if (currentTask != nullptr) {
     currentTask->taskFunction();
     currentTask->lastRunTime = systemTime;
+
+    // delayMicroseconds(100);
+    // Serial.print("task " + String(taskEt) + " #");
+    // delay(2);
   }
 }
 
