@@ -112,9 +112,9 @@ void setup() {
   // Creaza task-urile
   task[0] = { task1, lastTime, 3 };
   task[1] = { task2, lastTime, 3 };
-  task[2] = { task3, lastTime, 7 };
-  task[3] = { task4, lastTime, 7 };
-  task[4] = { task5, lastTime, 7 };
+  task[2] = { task3, lastTime, 6 };
+  task[3] = { task4, lastTime, 6 };
+  task[4] = { task5, lastTime, 6 };
 }
 
 void loop() {
@@ -153,7 +153,7 @@ void printZScore(String et, float score[N], int start) {
 
   ZScore += " #";
   Serial.print(ZScore);
-  delay(5);
+  delay(6);
 }
 
 void computeZScore(float value, int& n, float values[N], float result[N]) {

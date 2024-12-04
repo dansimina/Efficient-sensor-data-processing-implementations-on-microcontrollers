@@ -9,8 +9,9 @@ namespace Arduino_GUI
     public partial class Form1 : Form
     {
         private HorizonControl horizonControl;
-        string serialDataIn;
-        string auxData;
+        private DistanceControl distanceControl;
+        private string serialDataIn;
+        private string auxData;
 
         public Form1()
         {
@@ -20,7 +21,7 @@ namespace Arduino_GUI
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
             InitializeHorizonControl();
-            InitializeProgressBar();
+            InitializeDistanceControl();
             InitializeChart(chartZScoreX);
             InitializeChart(chartZScoreY);
             InitializeChart(chartZScoreD);
@@ -31,17 +32,20 @@ namespace Arduino_GUI
             horizonControl = new HorizonControl
             {
                 Dock = DockStyle.Fill,
-                Pitch = 0
+                Pitch = 0,
+                Tilt = 0
             };
             horizonPanel.Controls.Add(horizonControl);
         }
 
-        private void InitializeProgressBar()
+        private void InitializeDistanceControl()
         {
-            progressBarDistance.Style = ProgressBarStyle.Continuous;
-            progressBarDistance.Value = 0;
-            progressBarDistance.Minimum = 0;
-            progressBarDistance.Maximum = 100;
+            distanceControl = new DistanceControl
+            {
+                Dock = DockStyle.Fill,
+                Distance = 0
+            };
+            distancePanel.Controls.Add(distanceControl);
         }
 
         private void InitializeChart(Chart chart)
@@ -164,10 +168,7 @@ namespace Arduino_GUI
                         break;
                     case "task":
                         richTextBox.Text += serialDataIn + "\n";
-                        if(richTextBox.Text.Length > 100)
-                        {
-                            richTextBox.Text = "";
-                        }
+                        
                         break;
                 }
             }
@@ -261,7 +262,7 @@ namespace Arduino_GUI
         {
             string[] dist = serialDataIn.Split(' ');
             int distance = (int)Convert.ToDouble(dist[0]);
-            progressBarDistance.Value = 100 - distance;
+            distanceControl.Distance = 100 - distance;
         }
 
         private void UpdateHorizon(object sender, EventArgs e)
