@@ -68,27 +68,59 @@ float bufferDistance[BUFFER_SIZE]{};
 int headBufferDistance = 0;
 int tailBufferDistance = 0;
 
+void insertIntoBuffer(int value, int& head, int& tail, float buffer[BUFFER_SIZE]) {
+  buffer[tail] = value;
+  tail = (tail + 1) % BUFFER_SIZE;
+  if(tail == head) {
+    head = (head + 1) % BUFFER_SIZE;
+  }
+}
+
+float extractFromBuffer(int& head, int& tail, float buffer[BUFFER_SIZE]) {
+  if(head == tail) {
+    return 0;
+  }
+
+  float value = buffer[head];
+  head = (head + 1) % BUFFER_SIZE;
+
+  return value;
+}
+
 void task1() {
   readAngles();
+
+  insertIntoBuffer(angleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
+  insertIntoBuffer(angleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
+
   printAngles();
 }
 
 void task2() {
   readDistance();
+
+  insertIntoBuffer(distance, headBufferDistance, tailBufferDistance, bufferDistance);
+
   printDistance();
 }
 
 void task3() {
-  computeZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
+  float angle = extractFromBuffer(headBufferAngleX, tailBufferAngleX, bufferAngleX);
+
+  computeZScoreWelford(angle, ptrX, nX, meanX, valuesX, M2nX, result);
   printZScore("x", result, ptrX);
 }
 
 void task4() {
-  computeZScoreWelford(angleY, ptrY, nY, meanY, valuesY, M2nY, result);
+  float angle = extractFromBuffer(headBufferAngleY, tailBufferAngleY, bufferAngleY);
+
+  computeZScoreWelford(angle, ptrY, nY, meanY, valuesY, M2nY, result);
   printZScore("y", result, ptrY);
 }
 
 void task5() {
+  float distance = extractFromBuffer(headBufferDistance, tailBufferDistance, bufferDistance);
+
   computeZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
   printZScore("d", result, ptrD);
 }
@@ -245,10 +277,15 @@ void readDistance() {
 }
 
 void printAngles() {
+  float auxAngleX = max(angleX, -89.0);
+  auxAngleX = min(angleX, 89.0);
+  float auxAngleY = max(angleY, -89.0);
+  angleY = min(angleY, 89.0);
+
   Serial.print("angles ");
-  Serial.print(angleX);
+  Serial.print(auxAngleX);
   Serial.print(" ");
-  Serial.print(angleY);
+  Serial.print(auxAngleY);
   Serial.print(" #");
   delay(3);
 }
@@ -288,11 +325,6 @@ void readAngles() {
 
   angleX = alpha * (angleX) + (1 - alpha) * accAngleX;
   angleY = alpha * (angleY) + (1 - alpha) * accAngleY;
-
-  angleX = max(angleX, -89.0);
-  angleX = min(angleX, 89.0);
-  angleY = max(angleY, -89.0);
-  angleY = min(angleY, 89.0);
 }
 
 // Functie pentru a citi valori de la registrii MPU-6050
