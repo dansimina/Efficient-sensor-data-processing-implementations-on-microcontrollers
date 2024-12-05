@@ -61,37 +61,43 @@ unsigned long systemTime;
 float bufferAngleX[BUFFER_SIZE]{};
 int headBufferAngleX = 0;
 int tailBufferAngleX = 0;
+int sizeBufferAngleX = 0;
+
 float bufferAngleY[BUFFER_SIZE]{};
 int headBufferAngleY = 0;
 int tailBufferAngleY = 0;
+int sizeBufferAngleY = 0;
+
 float bufferDistance[BUFFER_SIZE]{};
 int headBufferDistance = 0;
 int tailBufferDistance = 0;
+int sizeBufferDistance = 0;
 
-void insertIntoBuffer(int value, int& head, int& tail, float buffer[BUFFER_SIZE]) {
-  buffer[tail] = value;
-  tail = (tail + 1) % BUFFER_SIZE;
-  if(tail == head) {
-    head = (head + 1) % BUFFER_SIZE;
-  }
+void insertIntoBuffer(float value, int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
+    if(size == BUFFER_SIZE) {
+        head = (head + 1) % BUFFER_SIZE;
+    }
+    size++;
+    buffer[tail] = value;
+    tail = (tail + 1) % BUFFER_SIZE;
 }
 
-float extractFromBuffer(int& head, int& tail, float buffer[BUFFER_SIZE]) {
-  if(head == tail) {
-    return 0;
-  }
+float extractFromBuffer(int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
+    if(size == 0) {
+        return 0;
+    }
+    size--;
+    float value = buffer[head];
+    head = (head + 1) % BUFFER_SIZE;
 
-  float value = buffer[head];
-  head = (head + 1) % BUFFER_SIZE;
-
-  return value;
+    return value;
 }
 
 void task1() {
   readAngles();
 
-  insertIntoBuffer(angleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
-  insertIntoBuffer(angleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
+  insertIntoBuffer(angleX, sizeBufferAngleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
+  insertIntoBuffer(angleY, sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
 
   printAngles();
 }
@@ -99,27 +105,27 @@ void task1() {
 void task2() {
   readDistance();
 
-  insertIntoBuffer(distance, headBufferDistance, tailBufferDistance, bufferDistance);
+  insertIntoBuffer(distance, sizeBufferDistance, headBufferDistance, tailBufferDistance, bufferDistance);
 
   printDistance();
 }
 
 void task3() {
-  float angle = extractFromBuffer(headBufferAngleX, tailBufferAngleX, bufferAngleX);
+  float angle = extractFromBuffer(sizeBufferAngleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
 
   computeZScoreWelford(angle, ptrX, nX, meanX, valuesX, M2nX, result);
   printZScore("x", result, ptrX);
 }
 
 void task4() {
-  float angle = extractFromBuffer(headBufferAngleY, tailBufferAngleY, bufferAngleY);
+  float angle = extractFromBuffer(sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
 
   computeZScoreWelford(angle, ptrY, nY, meanY, valuesY, M2nY, result);
   printZScore("y", result, ptrY);
 }
 
 void task5() {
-  float distance = extractFromBuffer(headBufferDistance, tailBufferDistance, bufferDistance);
+  float distance = extractFromBuffer(sizeBufferDistance, headBufferDistance, tailBufferDistance, bufferDistance);
 
   computeZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
   printZScore("d", result, ptrD);
