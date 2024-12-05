@@ -125,6 +125,11 @@ void task5() {
   printZScore("d", result, ptrD);
 }
 
+// Time performance measurement
+#define TIME_WINDOW 200
+int totalRunningTime = 0;
+int count = 0;
+
 void setup() {
   Wire.begin();
   Serial.begin(115200);
@@ -150,6 +155,9 @@ void setup() {
 }
 
 void loop() {
+  // start time
+  unsigned long start = millis();
+
   systemTime = millis();
   unsigned long longestWaitingPeriod = 0;
   Task* currentTask = nullptr;
@@ -168,10 +176,23 @@ void loop() {
   if (currentTask != nullptr) {
     currentTask->taskFunction();
     currentTask->lastRunTime = systemTime;
+  }
 
-    // delayMicroseconds(100);
-    // Serial.print("task " + String(taskEt) + " #");
-    // delay(2);
+  //end time
+  unsigned long end = millis();
+
+  if(start < end) {
+    totalRunningTime += (end - start);
+    count++;
+
+    if(count == TIME_WINDOW) {
+      float average = (float)totalRunningTime / TIME_WINDOW;
+
+      Serial.print("running_time " + String(average) + " #");
+      totalRunningTime = 0;
+      count = 0;
+      delay(1);  
+    }
   }
 }
 

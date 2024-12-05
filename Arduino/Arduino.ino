@@ -46,6 +46,11 @@ float M2nD = 0.0;
 // Results
 float result[N] = {0};
 
+// Time performance measurement
+#define TIME_WINDOW 200
+int totalRunningTime = 0;
+int count = 0;
+
 void setup() {
   Wire.begin();
   Serial.begin(115200);
@@ -64,33 +69,40 @@ void setup() {
 }
 
 void loop() {
+  // start time
+  unsigned long start = millis();
+
   readAngles();
   printAngles();
-  delay(5);
 
   readDistance();
   printDistance();
-  delay(5);
-
-  // computeZScore(angleX, nX, valuesX, result);
-  // printZScore("x", result, 0);
-  // delay(10);
 
   computeZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
   printZScore("x", result, ptrX);
-  delay(7);
 
   computeZScoreWelford(angleY, ptrY, nY, meanY, valuesY, M2nY, result);
   printZScore("y", result, ptrY);
-  delay(7);
 
   computeZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
   printZScore("d", result, ptrD);
-  delay(7);
 
-  // computeStandardDeviation("x", angleX, ptrX, countX, runningSumX, valuesX, M2X);
+  //end time
+  unsigned long end = millis();
 
-  // delay(20);
+    if(start < end) {
+    totalRunningTime += (end - start);
+    count++;
+
+    if(count == TIME_WINDOW) {
+      float average = (float)totalRunningTime / TIME_WINDOW;
+
+      Serial.print("running_time " + String(average) + " #");
+      totalRunningTime = 0;
+      count = 0;
+      delay(1);  
+    }
+  }
 }
 
 void printZScore(String et, float score[N], int start) {
@@ -103,6 +115,7 @@ void printZScore(String et, float score[N], int start) {
 
   ZScore += " #";
   Serial.print(ZScore);
+  delay(6);
 }
 
 void computeZScore(float value, int& n, float values[N], float result[N]) {
@@ -181,6 +194,7 @@ void printDistance() {
   Serial.print("distance ");
   Serial.print(distance);
   Serial.print(" #");
+  delay(3);
 }
 
 void readDistance() {
@@ -201,6 +215,7 @@ void printAngles() {
   Serial.print(" ");
   Serial.print(angleY);
   Serial.print(" #");
+  delay(3);
 }
 
 void readAngles() {

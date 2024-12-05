@@ -166,11 +166,24 @@ namespace Arduino_GUI
                         serialDataIn = serialDataIn.Remove(0, 8);
                         this.Invoke(new EventHandler(UpdateZScoreD));
                         break;
-                    case "task":
-                        richTextBox.Text += serialDataIn + "\n";
-                        
+                    case "running_time":
+                        serialDataIn = serialDataIn.Remove(0, 13);
+                        this.Invoke(new EventHandler(displayAverageRunningTime));
                         break;
                 }
+            }
+        }
+
+        void displayAverageRunningTime(object sender, EventArgs e)
+        {
+
+            if (richTextBox.Text.Length > 10000)
+            {
+                richTextBox.Text = "Average running time: " + serialDataIn.Split(' ')[0] + " ms\n";
+            }
+            else
+            {
+                richTextBox.Text += "Average running time: " + serialDataIn.Split(' ')[0] + " ms\n";
             }
         }
 
