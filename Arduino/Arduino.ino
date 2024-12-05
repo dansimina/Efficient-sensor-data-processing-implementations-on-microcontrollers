@@ -8,7 +8,7 @@
 
 unsigned long lastTime;
 float angleX = 0, angleY = 0;
-const float alpha = 0.90;
+const float alpha = 0.85;
 
 // HC-SR04
 #define ECHO_PIN 10
@@ -115,7 +115,7 @@ void printZScore(String et, float score[N], int start) {
 
   ZScore += " #";
   Serial.print(ZScore);
-  delay(6);
+  delay(7);
 }
 
 void computeZScore(float value, int& n, float values[N], float result[N]) {
@@ -194,7 +194,7 @@ void printDistance() {
   Serial.print("distance ");
   Serial.print(distance);
   Serial.print(" #");
-  delay(3);
+  delay(4);
 }
 
 void readDistance() {
@@ -215,7 +215,7 @@ void printAngles() {
   Serial.print(" ");
   Serial.print(angleY);
   Serial.print(" #");
-  delay(3);
+  delay(4);
 }
 
 void readAngles() {

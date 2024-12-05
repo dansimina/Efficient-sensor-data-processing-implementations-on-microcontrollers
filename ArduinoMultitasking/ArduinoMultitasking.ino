@@ -8,7 +8,7 @@
 
 unsigned long lastTime;
 float angleX = 0, angleY = 0;
-const float alpha = 0.90;
+const float alpha = 0.85;
 
 // HC-SR04
 #define ECHO_PIN 10
@@ -17,6 +17,7 @@ const float alpha = 0.90;
 float distance = 0.0;
 
 // PROGRAM
+#define WAIT 8
 #define N 20
 
 float valuesX[N] = { 0 };
@@ -84,7 +85,7 @@ void insertIntoBuffer(float value, int& size, int& head, int& tail, float buffer
 
 float extractFromBuffer(int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
     if(size == 0) {
-        return 0;
+        return buffer[(head - 1 + BUFFER_SIZE) % BUFFER_SIZE];
     }
     size--;
     float value = buffer[head];
@@ -153,17 +154,18 @@ void setup() {
   lastTime = millis();  // Setează timpul initial
 
   // Creaza task-urile
-  task[0] = { task1, lastTime, 3 };
-  task[1] = { task2, lastTime, 3 };
-  task[2] = { task3, lastTime, 6 };
-  task[3] = { task4, lastTime, 6 };
-  task[4] = { task5, lastTime, 6 };
+  task[0] = { task1, lastTime, 8 };
+  task[1] = { task2, lastTime, 8 };
+  task[2] = { task3, lastTime, 8 };
+  task[3] = { task4, lastTime, 8 };
+  task[4] = { task5, lastTime, 8 };
 }
 
 void loop() {
   // start time
   unsigned long start = millis();
 
+  // planificator
   systemTime = millis();
   unsigned long longestWaitingPeriod = 0;
   Task* currentTask = nullptr;
@@ -212,7 +214,7 @@ void printZScore(String et, float score[N], int start) {
 
   ZScore += " #";
   Serial.print(ZScore);
-  delay(6);
+  delay(WAIT);
 }
 
 void computeZScore(float value, int& n, float values[N], float result[N]) {
@@ -288,7 +290,7 @@ void printDistance() {
   Serial.print("distance ");
   Serial.print(distance);
   Serial.print(" #");
-  delay(3);
+  delay(WAIT);
 }
 
 void readDistance() {
@@ -314,7 +316,7 @@ void printAngles() {
   Serial.print(" ");
   Serial.print(auxAngleY);
   Serial.print(" #");
-  delay(3);
+  delay(WAIT);
 }
 
 void readAngles() {
