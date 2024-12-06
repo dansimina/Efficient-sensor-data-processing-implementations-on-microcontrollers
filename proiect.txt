@@ -1,5 +1,14 @@
 de incarcat!!!
 
+pus datele intr-un tabel si facut grafice, nu screen-shot
+variat fereastra de timp la program si aratat cum creste timpul de rulare si memoria, totodata comparat rezultatele la z score, cu cat fereastra e mai mare cu atat sunt mai exacte
+
+comparatia intre codul multitasking si codul single-tasking
+
+folosit si welford si varianta simpla si comparat atat ca timp, dar si ca memorie
+
+
+
 incercat sa paralelizam, se face o paralelizare statica 4 thread-uri, cozi pentru valori, luam valori din coada
 masurat timp, memorie si comparat
 descris putin algoritmii in documentatie

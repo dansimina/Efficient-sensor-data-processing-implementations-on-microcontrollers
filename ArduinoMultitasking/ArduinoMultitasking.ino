@@ -17,7 +17,8 @@ const float alpha = 0.85;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT 8
+#define WAIT1 6
+#define WAIT2 4
 #define N 20
 
 float valuesX[N] = { 0 };
@@ -120,7 +121,7 @@ void task3() {
 
 void task4() {
   float angle = extractFromBuffer(sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
-
+  
   computeZScoreWelford(angle, ptrY, nY, meanY, valuesY, M2nY, result);
   printZScore("y", result, ptrY);
 }
@@ -154,8 +155,8 @@ void setup() {
   lastTime = millis();  // Setează timpul initial
 
   // Creaza task-urile
-  task[0] = { task1, lastTime, 8 };
-  task[1] = { task2, lastTime, 8 };
+  task[0] = { task1, lastTime, 6 };
+  task[1] = { task2, lastTime, 6 };
   task[2] = { task3, lastTime, 8 };
   task[3] = { task4, lastTime, 8 };
   task[4] = { task5, lastTime, 8 };
@@ -214,7 +215,7 @@ void printZScore(String et, float score[N], int start) {
 
   ZScore += " #";
   Serial.print(ZScore);
-  delay(WAIT);
+  delay(WAIT1);
 }
 
 void computeZScore(float value, int& n, float values[N], float result[N]) {
@@ -290,7 +291,7 @@ void printDistance() {
   Serial.print("distance ");
   Serial.print(distance);
   Serial.print(" #");
-  delay(WAIT);
+  delay(WAIT2);
 }
 
 void readDistance() {
@@ -316,7 +317,7 @@ void printAngles() {
   Serial.print(" ");
   Serial.print(auxAngleY);
   Serial.print(" #");
-  delay(WAIT);
+  delay(WAIT2);
 }
 
 void readAngles() {
