@@ -12,6 +12,7 @@ namespace Arduino_GUI
         private DistanceControl distanceControl;
         private string serialDataIn;
         private string auxData;
+        const int BAUD_RATE = 115200;
 
         public Form1()
         {
@@ -71,8 +72,7 @@ namespace Arduino_GUI
         {
             buttonConnect.Enabled = true;
             buttonDisconnect.Enabled = false;
-
-            comboBoxBaudRate.Text = "9600"; 
+            labelBaudRate.Text = BAUD_RATE.ToString();
         }
 
         private void buttonScanPort_Click(object sender, EventArgs e)
@@ -87,7 +87,7 @@ namespace Arduino_GUI
             try
             {
                 serialPort1.PortName = comboBoxPort.Text;
-                serialPort1.BaudRate = Convert.ToInt32(comboBoxBaudRate.Text);
+                serialPort1.BaudRate = BAUD_RATE;
                 serialPort1.Open();
 
                 buttonConnect.Enabled = false;

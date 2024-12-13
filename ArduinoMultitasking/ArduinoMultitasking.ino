@@ -17,9 +17,10 @@ const float alpha = 0.85;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 6
-#define WAIT2 4
+#define WAIT1 8
+#define WAIT2 5
 #define N 20
+#define PRINT_LEN 20
 
 float valuesX[N] = { 0 };
 int nX = 0;
@@ -133,33 +134,29 @@ void task5() {
   printZScore("d", result, ptrD);
 }
 
+void initializeTasks() {
+  task[0] = { task1, lastTime, 5 };
+  task[1] = { task2, lastTime, 5 };
+  task[2] = { task3, lastTime, 8 };
+  task[3] = { task4, lastTime, 8 };
+  task[4] = { task5, lastTime, 8 };
+}
+
 // Time performance measurement
 #define TIME_WINDOW 200
 int totalRunningTime = 0;
 int count = 0;
 
 void setup() {
-  Wire.begin();
+  initializeMPU6050();
+
   Serial.begin(115200);
 
-  // Initializeaza MPU-6050
-  Wire.beginTransmission(MPU6050_ADDR);
-  Wire.write(PWR_MGMT_1);  // Selecteaza registrul de management al puterii
-  Wire.write(0);           // Scoate senzorul din modul sleep
-  Wire.endTransmission(true);
-
-  // Seteaza pinii pentru HC-SR04
-  pinMode(TRIG_PIN, OUTPUT);
-  pinMode(ECHO_PIN, INPUT);
+  initializeHCSR04();
 
   lastTime = millis();  // Setează timpul initial
 
-  // Creaza task-urile
-  task[0] = { task1, lastTime, 6 };
-  task[1] = { task2, lastTime, 6 };
-  task[2] = { task3, lastTime, 8 };
-  task[3] = { task4, lastTime, 8 };
-  task[4] = { task5, lastTime, 8 };
+  initializeTasks();
 }
 
 void loop() {
@@ -185,6 +182,7 @@ void loop() {
   if (currentTask != nullptr) {
     currentTask->taskFunction();
     currentTask->lastRunTime = systemTime;
+    delay(1);
   }
 
   //end time
@@ -208,7 +206,8 @@ void loop() {
 void printZScore(String et, float score[N], int start) {
   String ZScore = "zscore" + et;
 
-  for (int i = 0, j = start; i < N; i++, j = (j + 1) % N) {
+  start = (start + N - PRINT_LEN) % N;
+  for (int i = 0, j = start; i < PRINT_LEN; i++, j = (j + 1) % N) {
     ZScore += " ";
     ZScore += String(score[j]);
   }
@@ -294,6 +293,11 @@ void printDistance() {
   delay(WAIT2);
 }
 
+void initializeHCSR04() {
+  pinMode(TRIG_PIN, OUTPUT);
+  pinMode(ECHO_PIN, INPUT);
+}
+
 void readDistance() {
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
@@ -318,6 +322,27 @@ void printAngles() {
   Serial.print(auxAngleY);
   Serial.print(" #");
   delay(WAIT2);
+}
+
+void initializeMPU6050() {
+  Wire.begin();
+  // Wake up the MPU6050
+  Wire.beginTransmission(MPU6050_ADDR);
+  Wire.write(0x6B);  // PWR_MGMT_1 register
+  Wire.write(0);     // Set to zero to wake up
+  Wire.endTransmission(true);
+  
+  // Configure accelerometer (+/-2g)
+  Wire.beginTransmission(MPU6050_ADDR);
+  Wire.write(0x1C);  // ACCEL_CONFIG register
+  Wire.write(0x00);  // Set range to +/-2g
+  Wire.endTransmission(true);
+  
+  // Configure gyroscope (+/-250deg/s)
+  Wire.beginTransmission(MPU6050_ADDR);
+  Wire.write(0x1B);  // GYRO_CONFIG register
+  Wire.write(0x00);  // Set range to +/-250deg/s
+  Wire.endTransmission(true);
 }
 
 void readAngles() {
@@ -361,9 +386,13 @@ void readAngles() {
 int readMPU6050(unsigned char reg) {
   Wire.beginTransmission(MPU6050_ADDR);
   Wire.write(reg);
-  Wire.endTransmission(false);
-  Wire.requestFrom(MPU6050_ADDR, 2, true);
-
-  int value = (Wire.read() << 8) | Wire.read();
-  return value;
+  if(Wire.endTransmission(false) != 0) {
+    return 0; // Return 0 if transmission fails
+  }
+  
+  if(Wire.requestFrom(MPU6050_ADDR, 2, true) != 2) {
+    return 0; // Return 0 if we couldn't get 2 bytes
+  }
+  
+  return (Wire.read() << 8) | Wire.read();
 }
