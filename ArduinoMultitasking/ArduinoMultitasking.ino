@@ -5,10 +5,11 @@
 #define PWR_MGMT_1 0x6B    // Registrul de putere
 #define ACCEL_XOUT_H 0x3B  // Registrul pentru accelerometru (axa X)
 #define GYRO_XOUT_H 0x43   // Registrul pentru giroscop (axa X)
+#define NUMBER_OF_VALUES 3
 
 unsigned long lastTime;
 float angleX = 0, angleY = 0;
-const float alpha = 0.85;
+const float alpha = 0.80;
 
 // HC-SR04
 #define ECHO_PIN 10
@@ -17,10 +18,10 @@ const float alpha = 0.85;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 8
-#define WAIT2 5
-#define N 20
-#define PRINT_LEN 20
+#define WAIT1 6
+#define WAIT2 3
+#define N 40
+#define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
 int nX = 0;
@@ -135,8 +136,8 @@ void task5() {
 }
 
 void initializeTasks() {
-  task[0] = { task1, lastTime, 5 };
-  task[1] = { task2, lastTime, 5 };
+  task[0] = { task1, lastTime, 6 };
+  task[1] = { task2, lastTime, 6 };
   task[2] = { task3, lastTime, 8 };
   task[3] = { task4, lastTime, 8 };
   task[4] = { task5, lastTime, 8 };
@@ -182,7 +183,7 @@ void loop() {
   if (currentTask != nullptr) {
     currentTask->taskFunction();
     currentTask->lastRunTime = systemTime;
-    delay(1);
+    delay(4);
   }
 
   //end time
@@ -198,7 +199,7 @@ void loop() {
       Serial.print("running_time " + String(average) + " #");
       totalRunningTime = 0;
       count = 0;
-      delay(1);  
+      delay(2);  
     }
   }
 }
@@ -346,40 +347,48 @@ void initializeMPU6050() {
 }
 
 void readAngles() {
-  int ax, ay, az;
-  int gx, gy, gz;
+  float sumAngleX = 0;
+  float sumAngleY = 0;
+  
+  for(int i = 0; i < NUMBER_OF_VALUES; i++) {
+    int ax, ay, az;
+    int gx, gy, gz;
 
-  // Citeste valorile accelerometrului si giroscopului
-  ax = readMPU6050(ACCEL_XOUT_H);
-  ay = readMPU6050(ACCEL_XOUT_H + 2);
-  az = readMPU6050(ACCEL_XOUT_H + 4);
-  gx = readMPU6050(GYRO_XOUT_H);
-  gy = readMPU6050(GYRO_XOUT_H + 2);
-  gz = readMPU6050(GYRO_XOUT_H + 4);
+    // Citeste valorile accelerometrului si giroscopului
+    ax = readMPU6050(ACCEL_XOUT_H);
+    ay = readMPU6050(ACCEL_XOUT_H + 2);
+    az = readMPU6050(ACCEL_XOUT_H + 4);
+    gx = readMPU6050(GYRO_XOUT_H);
+    gy = readMPU6050(GYRO_XOUT_H + 2);
+    gz = readMPU6050(GYRO_XOUT_H + 4);
 
-  // Conversia valorilor brute
-  float accX = ax / 16384.0;
-  float accY = ay / 16384.0;
-  float accZ = az / 16384.0;
-  float gyroX = gx / 131.0;
-  float gyroY = gy / 131.0;
-  float gyroZ = gz / 131.0;
+    // Conversia valorilor brute
+    float accX = ax / 16384.0;
+    float accY = ay / 16384.0;
+    float accZ = az / 16384.0;
+    float gyroX = gx / 131.0;
+    float gyroY = gy / 131.0;
+    float gyroZ = gz / 131.0;
 
-  // Calculeaza timpul scurs intre masuratori
-  unsigned long currentTime = millis();
-  float dt = (currentTime - lastTime) / 1000.0;  // Conversie la secunde
-  lastTime = currentTime;
+    // Calculeaza timpul scurs intre masuratori
+    unsigned long currentTime = millis();
+    float dt = (currentTime - lastTime) / 1000.0;  // Conversie la secunde
+    lastTime = currentTime;
 
-  // Calcularea unghiurilor din giroscop (integrarea datelor de la giroscop)
-  angleX += gyroX * dt;
-  angleY += gyroY * dt;
+    // Calcularea unghiurilor din giroscop (integrarea datelor de la giroscop)
+    angleX += gyroX * dt;
+    angleY += gyroY * dt;
 
-  // Calculeaza unghiul pe termen lung folosind accelerometrul
-  float accAngleX = atan2(accY, sqrt(accX * accX + accZ * accZ)) * 180 / PI;
-  float accAngleY = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
+    // Calculeaza unghiul pe termen lung folosind accelerometrul
+    float accAngleX = atan2(accY, sqrt(accX * accX + accZ * accZ)) * 180 / PI;
+    float accAngleY = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
 
-  angleX = alpha * (angleX) + (1 - alpha) * accAngleX;
-  angleY = alpha * (angleY) + (1 - alpha) * accAngleY;
+    sumAngleX += alpha * (angleX) + (1 - alpha) * accAngleX;
+    sumAngleY += alpha * (angleY) + (1 - alpha) * accAngleY;
+  }
+
+  angleX = sumAngleX / NUMBER_OF_VALUES;
+  angleY = sumAngleY / NUMBER_OF_VALUES;
 }
 
 // Functie pentru a citi valori de la registrii MPU-6050

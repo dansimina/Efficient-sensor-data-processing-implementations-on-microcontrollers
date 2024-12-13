@@ -51,8 +51,8 @@ namespace Arduino_GUI
 
         private void InitializeChart(Chart chart)
         {
-            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 15, 17, 18, 19, 20 };
-            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
             Series series = new Series();
             series.ChartType = SeriesChartType.Spline;
@@ -61,7 +61,7 @@ namespace Arduino_GUI
 
             ChartArea chartArea = chart.ChartAreas[0];
             chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
-            chartArea.AxisX.Maximum = 20;          // Valoarea maximă de pe axa X
+            chartArea.AxisX.Maximum = 15;          // Valoarea maximă de pe axa X
             chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
             chartArea.AxisY.Minimum = -4;          // Valoarea minimă de pe axa Y
             chartArea.AxisY.Maximum = 4;         // Valoarea maximă de pe axa Y
