@@ -27,11 +27,26 @@ float distance = 0.0;
 float valuesX[N] = { 0 };
 int nX = 0;
 
+// Welford
+int ptrX = N - 1;
+float meanX = 0.0;
+float M2nX = 0.0;
+
 float valuesY[N] = { 0 };
 int nY = 0;
 
+// Welford
+int ptrY = N - 1;
+float meanY = 0.0;
+float M2nY = 0.0;
+
 float valuesD[N] = { 0 };
 int nD = 0;
+
+// Welford
+int ptrD = N - 1;
+float meanD = 0.0;
+float M2nD = 0.0;
 
 // Results
 float result[N] = { 0 };
@@ -103,24 +118,22 @@ void task2() {
 void task3() {
   float angle = extractFromBuffer(sizeBufferAngleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
 
-  computeZScore(angle, nX, valuesX, result);
-  printZScore("x", result);
+  computeZScoreWelford(angle, ptrX, nX, meanX, valuesX, M2nX, result);
+  printZScore("x", result, ptrX);
 }
 
 void task4() {
   float angle = extractFromBuffer(sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
   
-  computeZScore(angle, nY, valuesY, result);
-  
-  printZScore("y", result);
+  computeZScoreWelford(angle, ptrY, nY, meanY, valuesY, M2nY, result);
+  printZScore("y", result, ptrY);
 }
 
 void task5() {
   float distance = extractFromBuffer(sizeBufferDistance, headBufferDistance, tailBufferDistance, bufferDistance);
 
-  computeZScore(distance, nD, valuesD, result);
-
-  printZScore("d", result);
+  computeZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
+  printZScore("d", result, ptrD);
 }
 
 void initializeTasks() {
@@ -214,12 +227,13 @@ void computeMaxUsedRam() {
   maxUsedRAM = max(maxUsedRAM, getUsedRAM());
 }
 
-void printZScore(String et, float score[N]) {
+void printZScore(String et, float score[N], int start) {
   String ZScore = "zscore" + et;
 
-  for (int i = N - PRINT_LEN; i < N; i++) {
+  start = (start + N - PRINT_LEN) % N;
+  for (int i = 0, j = start; i < PRINT_LEN; i++, j = (j + 1) % N) {
     ZScore += " ";
-    ZScore += String(score[i]);
+    ZScore += String(score[j]);
   }
 
   ZScore += " #";
@@ -227,33 +241,38 @@ void printZScore(String et, float score[N]) {
   delay(WAIT1);
 }
 
-void computeZScore(float value, int& n, float values[N], float result[N]) {
+void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float values[N], float& M2, float result[N]) {
   if (n < N) {
-    values[n++] = value;
-  } 
-  else {
-    for (int i = 0; i < n - 1; i++) {
-      values[i] = values[i + 1];
-    }
-    values[n - 1] = value;
+    values[ptr] = value;
+    n++;
+    float delta = value - mean;
+    mean += delta / n;
+    float delta2 = value - mean;
+    M2 += delta * delta2;
+
+    computeMaxUsedRam();
+  } else {
+    float oldValue = values[ptr];
+    values[ptr] = value;
+
+    float deltaOld = oldValue - mean;
+    float delta = value - mean;
+
+    mean -= deltaOld / N;
+    M2 -= deltaOld * (oldValue - mean);
+
+    mean += delta / N;
+    float delta2 = value - mean;
+    M2 += delta * delta2;
+
+    computeMaxUsedRam();
   }
+  ptr = (ptr + 1) % N;
 
-
-  float mean = 0.0;
-  for (int i = 0; i < n; i++) {
-    mean += values[i];
-  }
-  mean /= n;
-
-  float standardDeviation = 0.0;
-  for (int i = 0; i < n; i++) {
-    standardDeviation += (values[i] - mean) * (values[i] - mean);
-  }
-
-  standardDeviation = sqrt(standardDeviation / (n - 1));
+  float standardDeviation = sqrt(max(M2 / (n - 1), 0.0f));
 
   for (int i = 0; i < n; i++) {
-    if (standardDeviation != 0) {
+    if (standardDeviation > 0) {
       result[i] = (values[i] - mean) / standardDeviation;
     } else {
       result[i] = 0;

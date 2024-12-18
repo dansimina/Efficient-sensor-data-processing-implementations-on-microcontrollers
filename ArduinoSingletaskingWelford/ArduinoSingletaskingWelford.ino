@@ -19,117 +19,37 @@ const float alpha = 0.75;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 6
-#define WAIT2 3
+#define WAIT1 8
+#define WAIT2 6
 #define N 25
 #define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
 int nX = 0;
 
+// Welford
+int ptrX = N - 1;
+float meanX = 0.0;
+float M2nX = 0.0;
+
 float valuesY[N] = { 0 };
 int nY = 0;
+
+// Welford
+int ptrY = N - 1;
+float meanY = 0.0;
+float M2nY = 0.0;
 
 float valuesD[N] = { 0 };
 int nD = 0;
 
+// Welford
+int ptrD = N - 1;
+float meanD = 0.0;
+float M2nD = 0.0;
+
 // Results
 float result[N] = { 0 };
-
-// Multitasking
-#define NO_OF_TASKS 5
-typedef struct {
-  void (*taskFunction)();
-  unsigned long lastRunTime;
-  unsigned long interval;
-} Task;
-
-Task task[NO_OF_TASKS];
-unsigned long systemTime;
-
-#define BUFFER_SIZE 10
-float bufferAngleX[BUFFER_SIZE]{};
-int headBufferAngleX = 0;
-int tailBufferAngleX = 0;
-int sizeBufferAngleX = 0;
-
-float bufferAngleY[BUFFER_SIZE]{};
-int headBufferAngleY = 0;
-int tailBufferAngleY = 0;
-int sizeBufferAngleY = 0;
-
-float bufferDistance[BUFFER_SIZE]{};
-int headBufferDistance = 0;
-int tailBufferDistance = 0;
-int sizeBufferDistance = 0;
-
-void insertIntoBuffer(float value, int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
-    if(size == BUFFER_SIZE) {
-        head = (head + 1) % BUFFER_SIZE;
-    }
-    size++;
-    buffer[tail] = value;
-    tail = (tail + 1) % BUFFER_SIZE;
-}
-
-float extractFromBuffer(int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
-    if(size == 0) {
-        return buffer[(head - 1 + BUFFER_SIZE) % BUFFER_SIZE];
-    }
-    size--;
-    float value = buffer[head];
-    head = (head + 1) % BUFFER_SIZE;
-
-    return value;
-}
-
-void task1() {
-  readAngles();
-
-  insertIntoBuffer(angleX, sizeBufferAngleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
-  insertIntoBuffer(angleY, sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
-
-  printAngles();
-}
-
-void task2() {
-  readDistance();
-
-  insertIntoBuffer(distance, sizeBufferDistance, headBufferDistance, tailBufferDistance, bufferDistance);
-
-  printDistance();
-}
-
-void task3() {
-  float angle = extractFromBuffer(sizeBufferAngleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
-
-  computeZScore(angle, nX, valuesX, result);
-  printZScore("x", result);
-}
-
-void task4() {
-  float angle = extractFromBuffer(sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
-  
-  computeZScore(angle, nY, valuesY, result);
-  
-  printZScore("y", result);
-}
-
-void task5() {
-  float distance = extractFromBuffer(sizeBufferDistance, headBufferDistance, tailBufferDistance, bufferDistance);
-
-  computeZScore(distance, nD, valuesD, result);
-
-  printZScore("d", result);
-}
-
-void initializeTasks() {
-  task[0] = { task1, lastTime, 6 };
-  task[1] = { task2, lastTime, 6 };
-  task[2] = { task3, lastTime, 8 };
-  task[3] = { task4, lastTime, 8 };
-  task[4] = { task5, lastTime, 8 };
-}
 
 // Time and memory performance measurement
 #define TIME_WINDOW 100
@@ -145,40 +65,30 @@ void setup() {
   initializeHCSR04();
 
   lastTime = millis();  // Setează timpul initial
-
-  initializeTasks();
 }
 
 void loop() {
   // start time
   unsigned long start = millis();
 
-  // planificator
-  systemTime = millis();
-  unsigned long longestWaitingPeriod = 0;
-  Task* currentTask = nullptr;
-  int taskEt = -1;
+  readAngles();
+  printAngles();
 
-  for (int i = 0; i < NO_OF_TASKS; i++) {
-    unsigned long waitingPeriod = systemTime - task[i].lastRunTime;
+  readDistance();
+  printDistance();
 
-    if (waitingPeriod >= task[i].interval && waitingPeriod > longestWaitingPeriod) {
-      currentTask = &task[i];
-      longestWaitingPeriod = waitingPeriod;
-      taskEt = i;
+  computeZScoreWelford(angleX, ptrX, nX, meanX, valuesX, M2nX, result);
+  printZScore("x", result, ptrX);
 
-      computeMaxUsedRam();
-    }
-  }
+  computeZScoreWelford(angleY, ptrY, nY, meanY, valuesY, M2nY, result);
+  printZScore("y", result, ptrY);
 
-  if (currentTask != nullptr) {
-    currentTask->taskFunction();
-    currentTask->lastRunTime = systemTime;
-    delay(4);
-  }
+  computeZScoreWelford(distance, ptrD, nD, meanD, valuesD, M2nD, result);
+  printZScore("d", result, ptrD);
 
   //end time
   unsigned long end = millis();
+
 
   computeMaxUsedRam();
   computeInfo(start, end);
@@ -214,12 +124,13 @@ void computeMaxUsedRam() {
   maxUsedRAM = max(maxUsedRAM, getUsedRAM());
 }
 
-void printZScore(String et, float score[N]) {
+void printZScore(String et, float score[N], int start) {
   String ZScore = "zscore" + et;
 
-  for (int i = N - PRINT_LEN; i < N; i++) {
+  start = (start + N - PRINT_LEN) % N;
+  for (int i = 0, j = start; i < PRINT_LEN; i++, j = (j + 1) % N) {
     ZScore += " ";
-    ZScore += String(score[i]);
+    ZScore += String(score[j]);
   }
 
   ZScore += " #";
@@ -227,33 +138,38 @@ void printZScore(String et, float score[N]) {
   delay(WAIT1);
 }
 
-void computeZScore(float value, int& n, float values[N], float result[N]) {
+void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float values[N], float& M2, float result[N]) {
   if (n < N) {
-    values[n++] = value;
-  } 
-  else {
-    for (int i = 0; i < n - 1; i++) {
-      values[i] = values[i + 1];
-    }
-    values[n - 1] = value;
+    values[ptr] = value;
+    n++;
+    float delta = value - mean;
+    mean += delta / n;
+    float delta2 = value - mean;
+    M2 += delta * delta2;
+
+    computeMaxUsedRam();
+  } else {
+    float oldValue = values[ptr];
+    values[ptr] = value;
+
+    float deltaOld = oldValue - mean;
+    float delta = value - mean;
+
+    mean -= deltaOld / N;
+    M2 -= deltaOld * (oldValue - mean);
+
+    mean += delta / N;
+    float delta2 = value - mean;
+    M2 += delta * delta2;
+
+    computeMaxUsedRam();
   }
+  ptr = (ptr + 1) % N;
 
-
-  float mean = 0.0;
-  for (int i = 0; i < n; i++) {
-    mean += values[i];
-  }
-  mean /= n;
-
-  float standardDeviation = 0.0;
-  for (int i = 0; i < n; i++) {
-    standardDeviation += (values[i] - mean) * (values[i] - mean);
-  }
-
-  standardDeviation = sqrt(standardDeviation / (n - 1));
+  float standardDeviation = sqrt(max(M2 / (n - 1), 0.0f));
 
   for (int i = 0; i < n; i++) {
-    if (standardDeviation != 0) {
+    if (standardDeviation > 0) {
       result[i] = (values[i] - mean) / standardDeviation;
     } else {
       result[i] = 0;

@@ -19,8 +19,8 @@ const float alpha = 0.75;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 6
-#define WAIT2 3
+#define WAIT1 8
+#define WAIT2 6
 #define N 25
 #define PRINT_LEN 15
 
@@ -36,101 +36,6 @@ int nD = 0;
 // Results
 float result[N] = { 0 };
 
-// Multitasking
-#define NO_OF_TASKS 5
-typedef struct {
-  void (*taskFunction)();
-  unsigned long lastRunTime;
-  unsigned long interval;
-} Task;
-
-Task task[NO_OF_TASKS];
-unsigned long systemTime;
-
-#define BUFFER_SIZE 10
-float bufferAngleX[BUFFER_SIZE]{};
-int headBufferAngleX = 0;
-int tailBufferAngleX = 0;
-int sizeBufferAngleX = 0;
-
-float bufferAngleY[BUFFER_SIZE]{};
-int headBufferAngleY = 0;
-int tailBufferAngleY = 0;
-int sizeBufferAngleY = 0;
-
-float bufferDistance[BUFFER_SIZE]{};
-int headBufferDistance = 0;
-int tailBufferDistance = 0;
-int sizeBufferDistance = 0;
-
-void insertIntoBuffer(float value, int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
-    if(size == BUFFER_SIZE) {
-        head = (head + 1) % BUFFER_SIZE;
-    }
-    size++;
-    buffer[tail] = value;
-    tail = (tail + 1) % BUFFER_SIZE;
-}
-
-float extractFromBuffer(int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
-    if(size == 0) {
-        return buffer[(head - 1 + BUFFER_SIZE) % BUFFER_SIZE];
-    }
-    size--;
-    float value = buffer[head];
-    head = (head + 1) % BUFFER_SIZE;
-
-    return value;
-}
-
-void task1() {
-  readAngles();
-
-  insertIntoBuffer(angleX, sizeBufferAngleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
-  insertIntoBuffer(angleY, sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
-
-  printAngles();
-}
-
-void task2() {
-  readDistance();
-
-  insertIntoBuffer(distance, sizeBufferDistance, headBufferDistance, tailBufferDistance, bufferDistance);
-
-  printDistance();
-}
-
-void task3() {
-  float angle = extractFromBuffer(sizeBufferAngleX, headBufferAngleX, tailBufferAngleX, bufferAngleX);
-
-  computeZScore(angle, nX, valuesX, result);
-  printZScore("x", result);
-}
-
-void task4() {
-  float angle = extractFromBuffer(sizeBufferAngleY, headBufferAngleY, tailBufferAngleY, bufferAngleY);
-  
-  computeZScore(angle, nY, valuesY, result);
-  
-  printZScore("y", result);
-}
-
-void task5() {
-  float distance = extractFromBuffer(sizeBufferDistance, headBufferDistance, tailBufferDistance, bufferDistance);
-
-  computeZScore(distance, nD, valuesD, result);
-
-  printZScore("d", result);
-}
-
-void initializeTasks() {
-  task[0] = { task1, lastTime, 6 };
-  task[1] = { task2, lastTime, 6 };
-  task[2] = { task3, lastTime, 8 };
-  task[3] = { task4, lastTime, 8 };
-  task[4] = { task5, lastTime, 8 };
-}
-
 // Time and memory performance measurement
 #define TIME_WINDOW 100
 int totalRunningTime = 0;
@@ -145,40 +50,30 @@ void setup() {
   initializeHCSR04();
 
   lastTime = millis();  // Setează timpul initial
-
-  initializeTasks();
 }
 
 void loop() {
   // start time
   unsigned long start = millis();
 
-  // planificator
-  systemTime = millis();
-  unsigned long longestWaitingPeriod = 0;
-  Task* currentTask = nullptr;
-  int taskEt = -1;
+  readAngles();
+  printAngles();
 
-  for (int i = 0; i < NO_OF_TASKS; i++) {
-    unsigned long waitingPeriod = systemTime - task[i].lastRunTime;
+  readDistance();
+  printDistance();
 
-    if (waitingPeriod >= task[i].interval && waitingPeriod > longestWaitingPeriod) {
-      currentTask = &task[i];
-      longestWaitingPeriod = waitingPeriod;
-      taskEt = i;
+  computeZScore(angleX, nX, valuesX, result);
+  printZScore("x", result);
 
-      computeMaxUsedRam();
-    }
-  }
+  computeZScore(angleY, nY, valuesY, result);
+  printZScore("y", result);
 
-  if (currentTask != nullptr) {
-    currentTask->taskFunction();
-    currentTask->lastRunTime = systemTime;
-    delay(4);
-  }
+  computeZScore(distance, nD, valuesD, result);
+  printZScore("d", result);
 
   //end time
   unsigned long end = millis();
+
 
   computeMaxUsedRam();
   computeInfo(start, end);
