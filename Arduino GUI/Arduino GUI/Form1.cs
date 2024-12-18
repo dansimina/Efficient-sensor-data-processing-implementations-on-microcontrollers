@@ -8,16 +8,17 @@ namespace Arduino_GUI
 {
     public partial class Form1 : Form
     {
+        private readonly object _dataLock = new object();
         private HorizonControl horizonControl;
         private DistanceControl distanceControl;
         private string serialDataIn;
         private string auxData;
         const int BAUD_RATE = 115200;
+        private const int MAX_TEXTBOX_LENGTH = 10000;
 
         public Form1()
         {
             InitializeComponent();
-
             this.AutoSize = true;
             this.AutoSizeMode = AutoSizeMode.GrowAndShrink;
 
@@ -27,6 +28,8 @@ namespace Arduino_GUI
             InitializeChart(chartZScoreY);
             InitializeChart(chartZScoreD);
         }
+
+        
 
         private void InitializeHorizonControl()
         {
@@ -51,21 +54,30 @@ namespace Arduino_GUI
 
         private void InitializeChart(Chart chart)
         {
-            int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
-            int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+            try
+            {
+                int[] xAxis = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 };
+                int[] yAxis = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-            Series series = new Series();
-            series.ChartType = SeriesChartType.Spline;
-            series.Points.DataBindXY(xAxis, yAxis);
-            chart.Series.Add(series);
+                chart.Series.Clear();
+                Series series = new Series();
+                series.ChartType = SeriesChartType.Spline;
+                series.Points.DataBindXY(xAxis, yAxis);
+                chart.Series.Add(series);
 
-            ChartArea chartArea = chart.ChartAreas[0];
-            chartArea.AxisX.Minimum = 1;          // Valoarea minimă de pe axa X
-            chartArea.AxisX.Maximum = 15;          // Valoarea maximă de pe axa X
-            chartArea.AxisX.Interval = 1;         // Intervalul dintre valorile de pe axa X
-            chartArea.AxisY.Minimum = -4;          // Valoarea minimă de pe axa Y
-            chartArea.AxisY.Maximum = 4;         // Valoarea maximă de pe axa Y
-            chartArea.AxisY.Interval = 1;
+                ChartArea chartArea = chart.ChartAreas[0];
+                chartArea.AxisX.Minimum = 1;
+                chartArea.AxisX.Maximum = 15;
+                chartArea.AxisX.Interval = 1;
+                chartArea.AxisY.Minimum = -4;
+                chartArea.AxisY.Maximum = 4;
+                chartArea.AxisY.Interval = 1;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error initializing chart: {ex.Message}", "Initialization Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -77,13 +89,28 @@ namespace Arduino_GUI
 
         private void buttonScanPort_Click(object sender, EventArgs e)
         {
-            string[] portList = SerialPort.GetPortNames();
-            comboBoxPort.Items.Clear();
-            comboBoxPort.Items.AddRange(portList);
+            try
+            {
+                string[] portList = SerialPort.GetPortNames();
+                comboBoxPort.Items.Clear();
+                comboBoxPort.Items.AddRange(portList);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error scanning ports: {ex.Message}", "Port Scan Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
         private void buttonConnect_Click(object sender, EventArgs e)
         {
+            if (string.IsNullOrEmpty(comboBoxPort.Text))
+            {
+                MessageBox.Show("Please select a port first.", "Connection Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
             try
             {
                 serialPort1.PortName = comboBoxPort.Text;
@@ -93,16 +120,26 @@ namespace Arduino_GUI
                 buttonConnect.Enabled = false;
                 buttonDisconnect.Enabled = true;
             }
-            catch(Exception error)
+            catch (Exception error)
             {
-                MessageBox.Show(error.Message);
+                MessageBox.Show($"Connection error: {error.Message}", "Connection Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
 
         private void buttonDisconnect_Click(object sender, EventArgs e)
         {
-            if(serialPort1.IsOpen)
+            DisconnectSerialPort();
+        }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            DisconnectSerialPort();
+        }
+
+        private void DisconnectSerialPort()
+        {
+            if (serialPort1?.IsOpen == true)
             {
                 try
                 {
@@ -112,35 +149,48 @@ namespace Arduino_GUI
                 }
                 catch (Exception error)
                 {
-                    MessageBox.Show(error.Message);
-                }
-            }
-        }
-
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
-        {
-            if (serialPort1.IsOpen)
-            {
-                try
-                {
-                    serialPort1.Close();
-                }
-                catch (Exception error)
-                {
-                    MessageBox.Show(error.Message);
+                    MessageBox.Show($"Disconnection error: {error.Message}", "Disconnection Error",
+                        MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }
 
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
-            auxData += serialPort1.ReadExisting();
-            if (auxData[auxData.Length - 1] == '#')
+            try
             {
-                serialDataIn = auxData;
-                auxData = "";
-                String command = serialDataIn.Split(' ')[0];
+                // to synchronize UI thread with Data Received thread
+                lock (_dataLock)
+                {
+                    string newData = serialPort1.ReadExisting();
+                    if (string.IsNullOrEmpty(newData))
+                        return;
 
+                    auxData += newData;
+                    if (auxData.Length > 0 && auxData[auxData.Length - 1] == '#')
+                    {
+                        serialDataIn = auxData;
+                        auxData = "";
+
+                        var parts = serialDataIn.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                        if (parts.Length == 0)
+                            return;
+
+                        String command = parts[0];
+                        ProcessCommand(command);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in data received: {ex.Message}");
+            }
+        }
+
+        private void ProcessCommand(string command)
+        {
+            try
+            {
                 switch (command)
                 {
                     case "angles":
@@ -151,151 +201,148 @@ namespace Arduino_GUI
                         serialDataIn = serialDataIn.Remove(0, 8);
                         this.Invoke(new EventHandler(UpdateZScoreX));
                         break;
-
                     case "zscorey":
                         serialDataIn = serialDataIn.Remove(0, 8);
                         this.Invoke(new EventHandler(UpdateZScoreY));
                         break;
-
                     case "distance":
                         serialDataIn = serialDataIn.Remove(0, 9);
                         this.Invoke(new EventHandler(UpdateDistance));
                         break;
-
                     case "zscored":
                         serialDataIn = serialDataIn.Remove(0, 8);
                         this.Invoke(new EventHandler(UpdateZScoreD));
                         break;
                     case "running_time":
                         serialDataIn = serialDataIn.Remove(0, 13);
-                        this.Invoke(new EventHandler(displayAverageRunningTime));
+                        this.Invoke(new EventHandler(DisplayAverageRunningTime));
                         break;
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing command: {ex.Message}");
+            }
         }
 
-        void displayAverageRunningTime(object sender, EventArgs e)
+        private void DisplayAverageRunningTime(object sender, EventArgs e)
         {
+            try
+            {
+                string[] timeParts = serialDataIn.Split(' ');
+                if (timeParts.Length > 0)
+                {
+                    string displayText = $"Average running time: {timeParts[0]} ms\n";
 
-            if (richTextBox.Text.Length > 10000)
-            {
-                richTextBox.Text = "Average running time: " + serialDataIn.Split(' ')[0] + " ms\n";
+                    if (richTextBox.Text.Length > MAX_TEXTBOX_LENGTH)
+                    {
+                        richTextBox.Text = displayText;
+                    }
+                    else
+                    {
+                        richTextBox.AppendText(displayText);
+                    }
+                }
             }
-            else
+            catch (Exception ex)
             {
-                richTextBox.Text += "Average running time: " + serialDataIn.Split(' ')[0] + " ms\n";
+                Console.WriteLine($"Error displaying running time: {ex.Message}");
+            }
+        }
+
+        private void UpdateZScore(Chart chart, string data)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(data))
+                    return;
+
+                data = data.Remove(data.Length - 2, 2);
+                float[] values = Array.ConvertAll(data.Split(' '), s => float.Parse(s));
+
+                var points = chart.Series[0].Points;
+
+                if (values.Length != points.Count)
+                {
+                    Console.WriteLine($"Mismatch between data length ({values.Length}) and chart points ({points.Count}).");
+                    return;
+                }
+
+                for (var i = 0; i < points.Count; ++i)
+                {
+                    points[i].YValues[0] = values[i];
+                }
+
+                chart.Invalidate();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating Z-Score: {ex.Message}");
             }
         }
 
         private void UpdateZScoreX(object sender, EventArgs e)
         {
-            try
-            {
-                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
-                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
-
-                var points = chartZScoreX.Series[1].Points;
-
-                if (values.Length != points.Count)
-                {
-                    Console.WriteLine("Mismatch between data length and chart points.");
-                    return;
-                }
-
-                for (var i = 0; i < points.Count; ++i)
-                {
-                    points[i].YValues[0] = values[i];
-                }
-
-                chartZScoreX.Invalidate();
-                
-            }
-            catch (Exception error)
-            {
-            }
+            UpdateZScore(chartZScoreX, serialDataIn);
         }
 
         private void UpdateZScoreY(object sender, EventArgs e)
         {
-            try
-            {
-                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
-                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
-
-                var points = chartZScoreY.Series[1].Points;
-
-                if (values.Length != points.Count)
-                {
-                    Console.WriteLine("Mismatch between data length and chart points.");
-                    return;
-                }
-
-                for (var i = 0; i < points.Count; ++i)
-                {
-                    points[i].YValues[0] = values[i];
-                }
-
-                chartZScoreY.Invalidate();
-
-            }
-            catch (Exception error)
-            {
-            }
+            UpdateZScore(chartZScoreY, serialDataIn);
         }
 
         private void UpdateZScoreD(object sender, EventArgs e)
         {
-            try
-            {
-                serialDataIn = serialDataIn.Remove(serialDataIn.Length - 2, 2);
-                float[] values = Array.ConvertAll(serialDataIn.Split(' '), s => float.Parse(s));
-
-                var points = chartZScoreD.Series[1].Points;
-
-                if (values.Length != points.Count)
-                {
-                    Console.WriteLine("Mismatch between data length and chart points.");
-                    return;
-                }
-
-                for (var i = 0; i < points.Count; ++i)
-                {
-                    points[i].YValues[0] = values[i];
-                }
-
-                chartZScoreD.Invalidate();
-
-            }
-            catch (Exception error)
-            {
-            }
+            UpdateZScore(chartZScoreD, serialDataIn);
         }
 
         private void UpdateDistance(object sender, EventArgs e)
         {
-            string[] dist = serialDataIn.Split(' ');
-            int distance = (int)Convert.ToDouble(dist[0]);
-            distanceControl.Distance = 100 - distance;
+            try
+            {
+                string[] dist = serialDataIn.Split(' ');
+                if (dist.Length > 0 && double.TryParse(dist[0], out double distance))
+                {
+                    distanceControl.Distance = 100 - (int)distance;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating distance: {ex.Message}");
+            }
         }
 
         private void UpdateHorizon(object sender, EventArgs e)
         {
-            string[] coord = serialDataIn.Split(' ');
-
-            if (coord.Length == 3)
+            try
             {
-                double x = Convert.ToDouble(coord[0]) * 2;
-                double y = Convert.ToDouble(coord[1]) * 2;
+                string[] coord = serialDataIn.Split(' ');
 
-                horizonControl.Pitch = -y;
-                horizonControl.Tilt = -x;
-            }   
+                if (coord.Length >= 3 &&
+                    double.TryParse(coord[0], out double x) &&
+                    double.TryParse(coord[1], out double y))
+                {
+                    horizonControl.Pitch = -y * 2;
+                    horizonControl.Tilt = -x * 2;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating horizon: {ex.Message}");
+            }
         }
 
         private void richTextBox_TextChanged(object sender, EventArgs e)
         {
-            richTextBox.SelectionStart = richTextBox.Text.Length;
-            richTextBox.ScrollToCaret();
+            try
+            {
+                richTextBox.SelectionStart = richTextBox.Text.Length;
+                richTextBox.ScrollToCaret();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating text box: {ex.Message}");
+            }
         }
     }
 }
