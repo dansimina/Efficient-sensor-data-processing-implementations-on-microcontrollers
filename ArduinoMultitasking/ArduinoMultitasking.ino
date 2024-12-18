@@ -1,4 +1,5 @@
 #include <Wire.h>
+#include <Arduino.h>
 
 // MPU6050
 #define MPU6050_ADDR 0x68  // Adresa I2C a senzorului MPU-6050
@@ -143,10 +144,11 @@ void initializeTasks() {
   task[4] = { task5, lastTime, 8 };
 }
 
-// Time performance measurement
+// Time and memory performance measurement
 #define TIME_WINDOW 100
 int totalRunningTime = 0;
 int count = 0;
+int maxUsedRAM = 0;
 
 void setup() {
   initializeMPU6050();
@@ -177,6 +179,8 @@ void loop() {
       currentTask = &task[i];
       longestWaitingPeriod = waitingPeriod;
       taskEt = i;
+
+      computeMaxUsedRam();
     }
   }
 
@@ -189,19 +193,38 @@ void loop() {
   //end time
   unsigned long end = millis();
 
+  computeMaxUsedRam();
+  computeInfo(start, end);
+}
+
+void computeInfo(int start, int end) {
   if(start < end) {
     totalRunningTime += (end - start);
     count++;
 
     if(count == TIME_WINDOW) {
-      float average = (float)totalRunningTime / TIME_WINDOW;
+      float averageTime = (float)totalRunningTime / TIME_WINDOW;
 
-      Serial.print("running_time " + String(average) + " #");
+      Serial.print("running_info " + String(averageTime) + " " + String(maxUsedRAM) + " #");
       totalRunningTime = 0;
       count = 0;
+      maxUsedRAM = 0;
       delay(3);  
     }
   }
+}
+
+int getUsedRAM() {
+    extern int __heap_start, *__brkval;
+    int v;
+    // Calculate free RAM
+    int freeRAM = (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
+    // Total RAM on Arduino Uno is 2048 bytes
+    return 2048 - freeRAM;
+}
+
+void computeMaxUsedRam() {
+  maxUsedRAM = max(maxUsedRAM, getUsedRAM());
 }
 
 void printZScore(String et, float score[N], int start) {
@@ -216,6 +239,8 @@ void printZScore(String et, float score[N], int start) {
   ZScore += " #";
   Serial.print(ZScore);
   delay(WAIT1);
+
+  computeMaxUsedRam();
 }
 
 void computeZScore(float value, int& n, float values[N], float result[N]) {
@@ -250,6 +275,8 @@ void computeZScore(float value, int& n, float values[N], float result[N]) {
       result[i] = 0;
     }
   }
+
+  computeMaxUsedRam();
 }
 
 void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float values[N], float& M2, float result[N]) {
@@ -260,6 +287,8 @@ void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float valu
     mean += delta / n;
     float delta2 = value - mean;
     M2 += delta * delta2;
+
+    computeMaxUsedRam();
   } else {
     float oldValue = values[ptr];
     values[ptr] = value;
@@ -273,6 +302,8 @@ void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float valu
     mean += delta / N;
     float delta2 = value - mean;
     M2 += delta * delta2;
+
+    computeMaxUsedRam();
   }
   ptr = (ptr + 1) % N;
 
@@ -285,6 +316,8 @@ void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float valu
       result[i] = 0;
     }
   }
+
+  computeMaxUsedRam();
 }
 
 void printDistance() {
@@ -292,6 +325,8 @@ void printDistance() {
   Serial.print(distance);
   Serial.print(" #");
   delay(WAIT2);
+
+  computeMaxUsedRam();
 }
 
 void initializeHCSR04() {
@@ -309,6 +344,8 @@ void readDistance() {
   float duration = pulseIn(ECHO_PIN, HIGH);
   // Viteza = Distanta / Timp => Distanta = Viteza * timp, se imparte la doi pentru ca e durata dus intors
   distance = min((duration * 0.0343) / 2, 100.0);
+
+  computeMaxUsedRam();
 }
 
 void printAngles() {
@@ -323,6 +360,8 @@ void printAngles() {
   Serial.print(auxAngleY);
   Serial.print(" #");
   delay(WAIT2);
+
+  computeMaxUsedRam();
 }
 
 void initializeMPU6050() {
@@ -344,6 +383,8 @@ void initializeMPU6050() {
   Wire.write(0x1B);  // GYRO_CONFIG register
   Wire.write(0x00);  // Set range to +/-250deg/s
   Wire.endTransmission(true);
+
+  computeMaxUsedRam();
 }
 
 void readAngles() {
@@ -390,13 +431,15 @@ void readAngles() {
   float auxAngleX = sumAngleX / NUMBER_OF_VALUES;
   float auxAngleY = sumAngleY / NUMBER_OF_VALUES;
 
-  if(abs(angleX - auxAngleX) >= 1) {
+  if(abs(angleX - auxAngleX) >= 0.5) {
     angleX = auxAngleX;
   }
 
-  if(abs(angleY - auxAngleY) >= 1) {
+  if(abs(angleY - auxAngleY) >= 0.5) {
     angleY = auxAngleY;
   }
+
+  computeMaxUsedRam();
 }
 
 // Functie pentru a citi valori de la registrii MPU-6050

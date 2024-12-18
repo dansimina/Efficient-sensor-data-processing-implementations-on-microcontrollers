@@ -213,9 +213,9 @@ namespace Arduino_GUI
                         serialDataIn = serialDataIn.Remove(0, 8);
                         this.Invoke(new EventHandler(UpdateZScoreD));
                         break;
-                    case "running_time":
+                    case "running_info":
                         serialDataIn = serialDataIn.Remove(0, 13);
-                        this.Invoke(new EventHandler(DisplayAverageRunningTime));
+                        this.Invoke(new EventHandler(DisplayRunningInfo));
                         break;
                 }
             }
@@ -225,14 +225,14 @@ namespace Arduino_GUI
             }
         }
 
-        private void DisplayAverageRunningTime(object sender, EventArgs e)
+        private void DisplayRunningInfo(object sender, EventArgs e)
         {
             try
             {
-                string[] timeParts = serialDataIn.Split(' ');
-                if (timeParts.Length > 0)
+                string[] infoParts = serialDataIn.Split(' ');
+                if (infoParts.Length > 0)
                 {
-                    string displayText = $"Average running time: {timeParts[0]} ms\n";
+                    string displayText = $"Average running time: {infoParts[0]} ms\nMax used RAM: {infoParts[1]}\n";
 
                     if (richTextBox.Text.Length > MAX_TEXTBOX_LENGTH)
                     {
