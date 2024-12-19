@@ -23,7 +23,7 @@ float distance = 0.0;
 // PROGRAM
 #define WAIT1 8
 #define WAIT2 4
-#define N 25
+#define N 15
 #define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
@@ -39,7 +39,7 @@ int nD = 0;
 float result[N] = { 0 };
 
 // Time and memory performance measurement
-#define TIME_WINDOW 10
+#define TIME_WINDOW 500
 unsigned long totalRunningTime = 0;
 int count = 0;
 int maxUsedRAM = 0;
@@ -150,13 +150,15 @@ void computeZScore(float value, int& n, float values[N], float result[N]) {
 
   standardDeviation = sqrt(standardDeviation / (n - 1));
 
-  for (int i = 0; i < n; i++) {
-    if (standardDeviation != 0) {
-      result[i] = (values[i] - mean) / standardDeviation;
+  if (standardDeviation > 0) {
+        for (int i = 0; i < n; i++) {
+            result[i] = (values[i] - mean) / standardDeviation;
+        }
     } else {
-      result[i] = 0;
+        for (int i = 0; i < n; i++) {
+            result[i] = 0;
+        }
     }
-  }
 
   computeMaxUsedRam();
 }

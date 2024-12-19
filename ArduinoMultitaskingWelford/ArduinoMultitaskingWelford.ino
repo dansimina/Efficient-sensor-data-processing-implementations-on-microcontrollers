@@ -23,7 +23,7 @@ float distance = 0.0;
 // PROGRAM
 #define WAIT1 4
 #define WAIT2 2
-#define N 25
+#define N 20
 #define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
@@ -151,7 +151,7 @@ void initializeTasks() {
 }
 
 // Time and memory performance measurement
-#define TIME_WINDOW 100
+#define TIME_WINDOW 500
 unsigned long totalRunningTime = 0;
 int count = 0;
 int maxUsedRAM = 0;
@@ -250,36 +250,49 @@ void printZScore(String et, float score[N], int start) {
 }
 
 void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float values[N], float& M2, float result[N]) {
-  if (n < N) {
-    values[ptr] = value;
-    n++;
-    float delta = value - mean;
-    mean += delta / n;
-    float delta2 = value - mean;
-    M2 += delta * delta2;
-  } else {
-    float oldValue = values[ptr];
-    values[ptr] = value;
+    if (n < N) {
+        values[ptr] = value;
+        n++;
 
-    float deltaOld = oldValue - mean;
-    float deltaNew = value - mean;
+        float delta = value - mean;
+        mean += delta / n;
+        float delta2 = value - mean;
+        M2 += delta * delta2;
 
-    mean -= deltaOld / N;
-    M2 -= deltaOld * (oldValue - mean);
+        computeMaxUsedRam();
+    } else {
+        float oldValue = values[ptr];
+        values[ptr] = value;
 
-    mean += deltaNew / N;
-    float delta2 = value - mean;
-    M2 += deltaNew * delta2;
-  }
-  ptr = (ptr + 1) % N;
+        float deltaOld = oldValue - mean;
+        mean -= deltaOld / N;
+        M2 -= deltaOld * (oldValue - mean);
 
-  float standardDeviation = (n > 1) ? sqrt(max(M2 / (n - 1), 0.0f)) : 0.0f;
+        float deltaNew = value - mean;
+        mean += deltaNew / N;
+        float delta2 = value - mean;
+        M2 += deltaNew * delta2;
 
-  for (int i = 0; i < N; i++) {
-    result[i] = (standardDeviation > 0) ? (values[i] - mean) / standardDeviation : 0.0f;
-  }
+        computeMaxUsedRam();
+    }
 
-  computeMaxUsedRam();
+    if (++ptr >= N) {
+        ptr = 0;
+    }
+
+    float standardDeviation = (n > 1) ? sqrt(max(M2 / (n - 1), 0.0f)) : 0.0f;
+
+    if (standardDeviation > 0) {
+        for (int i = 0; i < n; i++) {
+            result[i] = (values[i] - mean) / standardDeviation;
+        }
+    } else {
+        for (int i = 0; i < n; i++) {
+            result[i] = 0;
+        }
+    }
+
+    computeMaxUsedRam();
 }
 
 void printDistance() {

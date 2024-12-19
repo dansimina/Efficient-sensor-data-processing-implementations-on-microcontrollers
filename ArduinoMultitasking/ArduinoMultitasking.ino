@@ -23,7 +23,7 @@ float distance = 0.0;
 // PROGRAM
 #define WAIT1 4
 #define WAIT2 2
-#define N 25
+#define N 15
 #define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
@@ -138,7 +138,7 @@ void initializeTasks() {
 }
 
 // Time and memory performance measurement
-#define TIME_WINDOW 10
+#define TIME_WINDOW 500
 unsigned long totalRunningTime = 0;
 int count = 0;
 int maxUsedRAM = 0;
@@ -238,8 +238,7 @@ void printZScore(String et, float score[N]) {
 void computeZScore(float value, int& n, float values[N], float result[N]) {
   if (n < N) {
     values[n++] = value;
-  } 
-  else {
+  } else {
     for (int i = 0; i < n - 1; i++) {
       values[i] = values[i + 1];
     }
@@ -260,13 +259,15 @@ void computeZScore(float value, int& n, float values[N], float result[N]) {
 
   standardDeviation = sqrt(standardDeviation / (n - 1));
 
-  for (int i = 0; i < n; i++) {
-    if (standardDeviation != 0) {
-      result[i] = (values[i] - mean) / standardDeviation;
+  if (standardDeviation > 0) {
+        for (int i = 0; i < n; i++) {
+            result[i] = (values[i] - mean) / standardDeviation;
+        }
     } else {
-      result[i] = 0;
+        for (int i = 0; i < n; i++) {
+            result[i] = 0;
+        }
     }
-  }
 
   computeMaxUsedRam();
 }
