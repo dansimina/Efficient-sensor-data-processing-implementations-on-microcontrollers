@@ -6,21 +6,23 @@
 #define PWR_MGMT_1 0x6B    // Registrul de putere
 #define ACCEL_XOUT_H 0x3B  // Registrul pentru accelerometru (axa X)
 #define GYRO_XOUT_H 0x43   // Registrul pentru giroscop (axa X)
-#define NUMBER_OF_VALUES 5
+#define ERR_ANGLE 0.5
 
 unsigned long lastTime;
 float angleX = 0, angleY = 0;
+float auxAngleX = 0, auxAngleY = 0;
 const float alpha = 0.75;
 
 // HC-SR04
 #define ECHO_PIN 10
 #define TRIG_PIN 9
+#define ERR_DISTANCE 1
 
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 8
-#define WAIT2 6
+#define WAIT1 7
+#define WAIT2 4
 #define N 25
 #define PRINT_LEN 15
 
@@ -80,29 +82,29 @@ void loop() {
 }
 
 void computeInfo(int start, int end) {
-  if(start < end) {
+  if (start < end) {
     totalRunningTime += (end - start);
     count++;
 
-    if(count == TIME_WINDOW) {
+    if (count == TIME_WINDOW) {
       float averageTime = (float)totalRunningTime / TIME_WINDOW;
 
       Serial.print("running_info " + String(averageTime) + " " + String(maxUsedRAM) + " #");
       totalRunningTime = 0;
       count = 0;
       maxUsedRAM = 0;
-      delay(WAIT2);  
+      delay(WAIT2);
     }
   }
 }
 
 int getUsedRAM() {
-    extern int __heap_start, *__brkval;
-    int v;
-    // Calculate free RAM
-    int freeRAM = (int) &v - (__brkval == 0 ? (int) &__heap_start : (int) __brkval);
-    // Total RAM on Arduino Uno is 2048 bytes
-    return 2048 - freeRAM;
+  extern int __heap_start, *__brkval;
+  int v;
+  // Calculate free RAM
+  int freeRAM = (int)&v - (__brkval == 0 ? (int)&__heap_start : (int)__brkval);
+  // Total RAM on Arduino Uno is 2048 bytes
+  return 2048 - freeRAM;
 }
 
 void computeMaxUsedRam() {
@@ -125,8 +127,7 @@ void printZScore(String et, float score[N]) {
 void computeZScore(float value, int& n, float values[N], float result[N]) {
   if (n < N) {
     values[n++] = value;
-  } 
-  else {
+  } else {
     for (int i = 0; i < n - 1; i++) {
       values[i] = values[i + 1];
     }
@@ -179,7 +180,11 @@ void readDistance() {
 
   float duration = pulseIn(ECHO_PIN, HIGH);
   // Viteza = Distanta / Timp => Distanta = Viteza * timp, se imparte la doi pentru ca e durata dus intors
-  distance = min((duration * 0.0343) / 2, 100.0);
+  float auxDistance = min((duration * 0.0343) / 2, 100.0);
+
+  if (abs(distance - auxDistance) >= ERR_DISTANCE) {
+    distance = auxDistance;
+  }
 }
 
 void printAngles() {
@@ -203,13 +208,13 @@ void initializeMPU6050() {
   Wire.write(0x6B);  // PWR_MGMT_1 register
   Wire.write(0);     // Set to zero to wake up
   Wire.endTransmission(true);
-  
+
   // Configure accelerometer (+/-2g)
   Wire.beginTransmission(MPU6050_ADDR);
   Wire.write(0x1C);  // ACCEL_CONFIG register
   Wire.write(0x00);  // Set range to +/-2g
   Wire.endTransmission(true);
-  
+
   // Configure gyroscope (+/-250deg/s)
   Wire.beginTransmission(MPU6050_ADDR);
   Wire.write(0x1B);  // GYRO_CONFIG register
@@ -218,54 +223,46 @@ void initializeMPU6050() {
 }
 
 void readAngles() {
-  float sumAngleX = 0;
-  float sumAngleY = 0;
-  
-  for(int i = 0; i < NUMBER_OF_VALUES; i++) {
-    int ax, ay, az;
-    int gx, gy, gz;
+  int ax, ay, az;
+  int gx, gy, gz;
 
-    // Citeste valorile accelerometrului si giroscopului
-    ax = readMPU6050(ACCEL_XOUT_H);
-    ay = readMPU6050(ACCEL_XOUT_H + 2);
-    az = readMPU6050(ACCEL_XOUT_H + 4);
-    gx = readMPU6050(GYRO_XOUT_H);
-    gy = readMPU6050(GYRO_XOUT_H + 2);
-    gz = readMPU6050(GYRO_XOUT_H + 4);
+  // Citeste valorile accelerometrului si giroscopului
+  ax = readMPU6050(ACCEL_XOUT_H);
+  ay = readMPU6050(ACCEL_XOUT_H + 2);
+  az = readMPU6050(ACCEL_XOUT_H + 4);
+  gx = readMPU6050(GYRO_XOUT_H);
+  gy = readMPU6050(GYRO_XOUT_H + 2);
+  gz = readMPU6050(GYRO_XOUT_H + 4);
 
-    // Conversia valorilor brute
-    float accX = ax / 16384.0;
-    float accY = ay / 16384.0;
-    float accZ = az / 16384.0;
-    float gyroX = gx / 131.0;
-    float gyroY = gy / 131.0;
-    float gyroZ = gz / 131.0;
+  // Conversia valorilor brute
+  float accX = ax / 16384.0;
+  float accY = ay / 16384.0;
+  float accZ = az / 16384.0;
+  float gyroX = gx / 131.0;
+  float gyroY = gy / 131.0;
+  float gyroZ = gz / 131.0;
 
-    // Calculeaza timpul scurs intre masuratori
-    unsigned long currentTime = millis();
-    float dt = (currentTime - lastTime) / 1000.0;  // Conversie la secunde
-    lastTime = currentTime;
+  // Calculeaza timpul scurs intre masuratori
+  unsigned long currentTime = millis();
+  float dt = (currentTime - lastTime) / 1000.0;  // Conversie la secunde
+  lastTime = currentTime;
 
-    // Calcularea unghiurilor din giroscop (integrarea datelor de la giroscop)
-    angleX += gyroX * dt;
-    angleY += gyroY * dt;
+  // Calcularea unghiurilor din giroscop (integrarea datelor de la giroscop)
+  auxAngleX += gyroX * dt;
+  auxAngleY += gyroY * dt;
 
-    // Calculeaza unghiul pe termen lung folosind accelerometrul
-    float accAngleX = atan2(accY, sqrt(accX * accX + accZ * accZ)) * 180 / PI;
-    float accAngleY = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
+  // Calculeaza unghiul pe termen lung folosind accelerometrul
+  float accAngleX = atan2(accY, sqrt(accX * accX + accZ * accZ)) * 180 / PI;
+  float accAngleY = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
 
-    sumAngleX += alpha * (angleX) + (1 - alpha) * accAngleX;
-    sumAngleY += alpha * (angleY) + (1 - alpha) * accAngleY;
-  }
+  auxAngleX = alpha * (auxAngleX) + (1 - alpha) * accAngleX;
+  auxAngleY = alpha * (auxAngleY) + (1 - alpha) * accAngleY;
 
-  float auxAngleX = sumAngleX / NUMBER_OF_VALUES;
-  float auxAngleY = sumAngleY / NUMBER_OF_VALUES;
-
-  if(abs(angleX - auxAngleX) >= 0.5) {
+  if (abs(angleX - auxAngleX) >= ERR_ANGLE) {
     angleX = auxAngleX;
   }
 
-  if(abs(angleY - auxAngleY) >= 0.5) {
+  if (abs(angleY - auxAngleY) >= ERR_ANGLE) {
     angleY = auxAngleY;
   }
 }
@@ -274,13 +271,13 @@ void readAngles() {
 int readMPU6050(unsigned char reg) {
   Wire.beginTransmission(MPU6050_ADDR);
   Wire.write(reg);
-  if(Wire.endTransmission(false) != 0) {
-    return 0; // Return 0 if transmission fails
+  if (Wire.endTransmission(false) != 0) {
+    return 0;  // Return 0 if transmission fails
   }
-  
-  if(Wire.requestFrom(MPU6050_ADDR, 2, true) != 2) {
-    return 0; // Return 0 if we couldn't get 2 bytes
+
+  if (Wire.requestFrom(MPU6050_ADDR, 2, true) != 2) {
+    return 0;  // Return 0 if we couldn't get 2 bytes
   }
-  
+
   return (Wire.read() << 8) | Wire.read();
 }

@@ -6,20 +6,22 @@
 #define PWR_MGMT_1 0x6B    // Registrul de putere
 #define ACCEL_XOUT_H 0x3B  // Registrul pentru accelerometru (axa X)
 #define GYRO_XOUT_H 0x43   // Registrul pentru giroscop (axa X)
-#define NUMBER_OF_VALUES 5
+#define ERR_ANGLE 0.5
 
 unsigned long lastTime;
 float angleX = 0, angleY = 0;
+float auxAngleX = 0, auxAngleY = 0;
 const float alpha = 0.75;
 
 // HC-SR04
 #define ECHO_PIN 10
 #define TRIG_PIN 9
+#define ERR_DISTANCE 1
 
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 6
+#define WAIT1 5
 #define WAIT2 3
 #define N 25
 #define PRINT_LEN 15
@@ -179,8 +181,6 @@ void loop() {
       currentTask = &task[i];
       longestWaitingPeriod = waitingPeriod;
       taskEt = i;
-
-      computeMaxUsedRam();
     }
   }
 
@@ -249,34 +249,26 @@ void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float valu
     mean += delta / n;
     float delta2 = value - mean;
     M2 += delta * delta2;
-
-    computeMaxUsedRam();
   } else {
     float oldValue = values[ptr];
     values[ptr] = value;
 
     float deltaOld = oldValue - mean;
-    float delta = value - mean;
+    float deltaNew = value - mean;
 
     mean -= deltaOld / N;
     M2 -= deltaOld * (oldValue - mean);
 
-    mean += delta / N;
+    mean += deltaNew / N;
     float delta2 = value - mean;
-    M2 += delta * delta2;
-
-    computeMaxUsedRam();
+    M2 += deltaNew * delta2;
   }
   ptr = (ptr + 1) % N;
 
-  float standardDeviation = sqrt(max(M2 / (n - 1), 0.0f));
+  float standardDeviation = (n > 1) ? sqrt(max(M2 / (n - 1), 0.0f)) : 0.0f;
 
-  for (int i = 0; i < n; i++) {
-    if (standardDeviation > 0) {
-      result[i] = (values[i] - mean) / standardDeviation;
-    } else {
-      result[i] = 0;
-    }
+  for (int i = 0; i < N; i++) {
+    result[i] = (standardDeviation > 0) ? (values[i] - mean) / standardDeviation : 0.0f;
   }
 
   computeMaxUsedRam();
@@ -303,7 +295,11 @@ void readDistance() {
 
   float duration = pulseIn(ECHO_PIN, HIGH);
   // Viteza = Distanta / Timp => Distanta = Viteza * timp, se imparte la doi pentru ca e durata dus intors
-  distance = min((duration * 0.0343) / 2, 100.0);
+  float auxDistance = min((duration * 0.0343) / 2, 100.0);
+
+  if (abs(distance - auxDistance) >= ERR_DISTANCE) {
+    distance = auxDistance;
+  }
 }
 
 void printAngles() {
@@ -342,54 +338,46 @@ void initializeMPU6050() {
 }
 
 void readAngles() {
-  float sumAngleX = 0;
-  float sumAngleY = 0;
-  
-  for(int i = 0; i < NUMBER_OF_VALUES; i++) {
-    int ax, ay, az;
-    int gx, gy, gz;
+  int ax, ay, az;
+  int gx, gy, gz;
 
-    // Citeste valorile accelerometrului si giroscopului
-    ax = readMPU6050(ACCEL_XOUT_H);
-    ay = readMPU6050(ACCEL_XOUT_H + 2);
-    az = readMPU6050(ACCEL_XOUT_H + 4);
-    gx = readMPU6050(GYRO_XOUT_H);
-    gy = readMPU6050(GYRO_XOUT_H + 2);
-    gz = readMPU6050(GYRO_XOUT_H + 4);
+  // Citeste valorile accelerometrului si giroscopului
+  ax = readMPU6050(ACCEL_XOUT_H);
+  ay = readMPU6050(ACCEL_XOUT_H + 2);
+  az = readMPU6050(ACCEL_XOUT_H + 4);
+  gx = readMPU6050(GYRO_XOUT_H);
+  gy = readMPU6050(GYRO_XOUT_H + 2);
+  gz = readMPU6050(GYRO_XOUT_H + 4);
 
-    // Conversia valorilor brute
-    float accX = ax / 16384.0;
-    float accY = ay / 16384.0;
-    float accZ = az / 16384.0;
-    float gyroX = gx / 131.0;
-    float gyroY = gy / 131.0;
-    float gyroZ = gz / 131.0;
+  // Conversia valorilor brute
+  float accX = ax / 16384.0;
+  float accY = ay / 16384.0;
+  float accZ = az / 16384.0;
+  float gyroX = gx / 131.0;
+  float gyroY = gy / 131.0;
+  float gyroZ = gz / 131.0;
 
-    // Calculeaza timpul scurs intre masuratori
-    unsigned long currentTime = millis();
-    float dt = (currentTime - lastTime) / 1000.0;  // Conversie la secunde
-    lastTime = currentTime;
+  // Calculeaza timpul scurs intre masuratori
+  unsigned long currentTime = millis();
+  float dt = (currentTime - lastTime) / 1000.0;  // Conversie la secunde
+  lastTime = currentTime;
 
-    // Calcularea unghiurilor din giroscop (integrarea datelor de la giroscop)
-    angleX += gyroX * dt;
-    angleY += gyroY * dt;
+  // Calcularea unghiurilor din giroscop (integrarea datelor de la giroscop)
+  auxAngleX += gyroX * dt;
+  auxAngleY += gyroY * dt;
 
-    // Calculeaza unghiul pe termen lung folosind accelerometrul
-    float accAngleX = atan2(accY, sqrt(accX * accX + accZ * accZ)) * 180 / PI;
-    float accAngleY = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
+  // Calculeaza unghiul pe termen lung folosind accelerometrul
+  float accAngleX = atan2(accY, sqrt(accX * accX + accZ * accZ)) * 180 / PI;
+  float accAngleY = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
 
-    sumAngleX += alpha * (angleX) + (1 - alpha) * accAngleX;
-    sumAngleY += alpha * (angleY) + (1 - alpha) * accAngleY;
-  }
+  auxAngleX = alpha * (auxAngleX) + (1 - alpha) * accAngleX;
+  auxAngleY = alpha * (auxAngleY) + (1 - alpha) * accAngleY;
 
-  float auxAngleX = sumAngleX / NUMBER_OF_VALUES;
-  float auxAngleY = sumAngleY / NUMBER_OF_VALUES;
-
-  if(abs(angleX - auxAngleX) >= 0.5) {
+  if (abs(angleX - auxAngleX) >= ERR_ANGLE) {
     angleX = auxAngleX;
   }
 
-  if(abs(angleY - auxAngleY) >= 0.5) {
+  if (abs(angleY - auxAngleY) >= ERR_ANGLE) {
     angleY = auxAngleY;
   }
 }
