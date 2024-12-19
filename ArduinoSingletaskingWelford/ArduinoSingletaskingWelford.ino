@@ -54,8 +54,8 @@ float M2nD = 0.0;
 float result[N] = { 0 };
 
 // Time and memory performance measurement
-#define TIME_WINDOW 100
-int totalRunningTime = 0;
+#define TIME_WINDOW 10
+unsigned long totalRunningTime = 0;
 int count = 0;
 int maxUsedRAM = 0;
 

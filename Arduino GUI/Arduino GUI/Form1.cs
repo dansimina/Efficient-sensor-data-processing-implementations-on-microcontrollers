@@ -344,5 +344,10 @@ namespace Arduino_GUI
                 Console.WriteLine($"Error updating text box: {ex.Message}");
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            richTextBox.Text = "";
+        }
     }
 }

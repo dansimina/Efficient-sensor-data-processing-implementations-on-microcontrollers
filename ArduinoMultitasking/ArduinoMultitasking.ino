@@ -138,8 +138,8 @@ void initializeTasks() {
 }
 
 // Time and memory performance measurement
-#define TIME_WINDOW 100
-int totalRunningTime = 0;
+#define TIME_WINDOW 10
+unsigned long totalRunningTime = 0;
 int count = 0;
 int maxUsedRAM = 0;
 
