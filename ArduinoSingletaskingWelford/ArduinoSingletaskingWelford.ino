@@ -21,7 +21,7 @@ const float alpha = 0.75;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 7
+#define WAIT1 8
 #define WAIT2 4
 #define N 25
 #define PRINT_LEN 15
