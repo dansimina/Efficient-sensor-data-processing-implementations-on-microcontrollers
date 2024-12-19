@@ -87,6 +87,8 @@ void insertIntoBuffer(float value, int& size, int& head, int& tail, float buffer
     size++;
     buffer[tail] = value;
     tail = (tail + 1) % BUFFER_SIZE;
+
+    computeMaxUsedRam();
 }
 
 float extractFromBuffer(int& size, int& head, int& tail, float buffer[BUFFER_SIZE]) {
@@ -96,6 +98,8 @@ float extractFromBuffer(int& size, int& head, int& tail, float buffer[BUFFER_SIZ
     size--;
     float value = buffer[head];
     head = (head + 1) % BUFFER_SIZE;
+
+    computeMaxUsedRam();
 
     return value;
 }
@@ -181,6 +185,8 @@ void loop() {
       currentTask = &task[i];
       longestWaitingPeriod = waitingPeriod;
       taskEt = i;
+
+      computeMaxUsedRam();
     }
   }
 
@@ -239,6 +245,8 @@ void printZScore(String et, float score[N], int start) {
   ZScore += " #";
   Serial.print(ZScore);
   delay(WAIT1);
+
+  computeMaxUsedRam();
 }
 
 void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float values[N], float& M2, float result[N]) {
@@ -279,6 +287,8 @@ void printDistance() {
   Serial.print(distance);
   Serial.print(" #");
   delay(WAIT2);
+
+  computeMaxUsedRam();
 }
 
 void initializeHCSR04() {
@@ -300,6 +310,8 @@ void readDistance() {
   if (abs(distance - auxDistance) >= ERR_DISTANCE) {
     distance = auxDistance;
   }
+
+  computeMaxUsedRam();
 }
 
 void printAngles() {
@@ -314,6 +326,8 @@ void printAngles() {
   Serial.print(auxAngleY);
   Serial.print(" #");
   delay(WAIT2);
+
+  computeMaxUsedRam();
 }
 
 void initializeMPU6050() {
@@ -380,6 +394,8 @@ void readAngles() {
   if (abs(angleY - auxAngleY) >= ERR_ANGLE) {
     angleY = auxAngleY;
   }
+
+  computeMaxUsedRam();
 }
 
 // Functie pentru a citi valori de la registrii MPU-6050
@@ -393,6 +409,8 @@ int readMPU6050(unsigned char reg) {
   if(Wire.requestFrom(MPU6050_ADDR, 2, true) != 2) {
     return 0; // Return 0 if we couldn't get 2 bytes
   }
+
+  computeMaxUsedRam();
   
   return (Wire.read() << 8) | Wire.read();
 }
