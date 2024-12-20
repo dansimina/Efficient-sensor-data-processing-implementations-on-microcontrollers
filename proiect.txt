@@ -1,5 +1,11 @@
 de incarcat!!!
 
+tras o linie in tabel unde e valoarea maxima.
+tras o linie si in tabel unde ma opresc
+refacut teste mai bine
+scris mai bine in descriere de ce unul e mai rapid sau altul ajunge pana la valori ale ferestrei mai mari
+
+
 pus datele intr-un tabel si facut grafice, nu screen-shot
 variat fereastra de timp la program si aratat cum creste timpul de rulare si memoria, totodata comparat rezultatele la z score, cu cat fereastra e mai mare cu atat sunt mai exacte
 

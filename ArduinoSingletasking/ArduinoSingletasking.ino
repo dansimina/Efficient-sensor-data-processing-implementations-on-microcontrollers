@@ -23,7 +23,7 @@ float distance = 0.0;
 // PROGRAM
 #define WAIT1 8
 #define WAIT2 4
-#define N 15
+#define N 20
 #define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
