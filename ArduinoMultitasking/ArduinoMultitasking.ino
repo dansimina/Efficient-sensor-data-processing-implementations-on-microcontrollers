@@ -23,7 +23,7 @@ float distance = 0.0;
 // PROGRAM
 #define WAIT1 6
 #define WAIT2 4
-#define N 15
+#define N 63
 #define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
@@ -230,6 +230,8 @@ void printZScore(String et, float score[N]) {
 
   ZScore += ">#";
   Serial.print(ZScore);
+
+  computeMaxUsedRam();
   delay(WAIT1);
 }
 
@@ -281,6 +283,8 @@ void printDistance() {
   distStr += String(distance, 0);
   distStr += ">#";
   Serial.print(distStr);
+
+  computeMaxUsedRam();
   delay(WAIT2);
 }
 
@@ -318,6 +322,8 @@ void printAngles() {
   angleStr += ">#";
   
   Serial.print(angleStr);
+
+  computeMaxUsedRam();
   delay(WAIT2);
 }
 

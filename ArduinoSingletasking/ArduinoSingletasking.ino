@@ -121,6 +121,8 @@ void printZScore(String et, float score[N]) {
 
   ZScore += ">#";
   Serial.print(ZScore);
+
+  computeMaxUsedRam();
   delay(WAIT1);
 }
 
@@ -172,6 +174,8 @@ void printDistance() {
   distStr += String(distance, 0);
   distStr += ">#";
   Serial.print(distStr);
+
+  computeMaxUsedRam();
   delay(WAIT2);
 }
 
@@ -209,6 +213,8 @@ void printAngles() {
   angleStr += ">#";
   
   Serial.print(angleStr);
+
+  computeMaxUsedRam();
   delay(WAIT2);
 }
 
