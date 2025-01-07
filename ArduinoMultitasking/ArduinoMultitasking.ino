@@ -21,9 +21,9 @@ const float alpha = 0.75;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 6
-#define WAIT2 4
-#define N 63
+#define WAIT1 10
+#define WAIT2 8
+#define N 15
 #define PRINT_LEN 15
 
 float valuesX[N] = { 0 };
@@ -263,7 +263,9 @@ void computeZScore(float value, int& n, float values[N], float result[N]) {
 
   float standardDeviation = sqrt(variance);
 
-  if (n > 1 && standardDeviation != 0) {
+  const float EPSILON = 1e-5;
+
+  if (n > 1 && standardDeviation > EPSILON) {
       for (int i = 0; i < n; i++) {
           result[i] = (values[i] - mean) / standardDeviation;
       }

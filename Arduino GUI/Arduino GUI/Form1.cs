@@ -303,7 +303,6 @@ namespace Arduino_GUI
                 if (string.IsNullOrEmpty(data))
                     return;
 
-                data = data.Remove(data.Length - 2, 2);
                 float[] values = Array.ConvertAll(data.Split(' '), s => float.Parse(s));
 
                 var points = chart.Series[0].Points;
@@ -347,7 +346,7 @@ namespace Arduino_GUI
             try
             {
                 string[] dist = serialDataIn.Split(' ');
-                if (dist.Length > 0 && double.TryParse(dist[0], out double distance))
+                if (dist.Length == 1 && double.TryParse(dist[0], out double distance))
                 {
                     distanceControl.Distance = 100 - (int)distance;
                 }
@@ -364,7 +363,7 @@ namespace Arduino_GUI
             {
                 string[] coord = serialDataIn.Split(' ');
 
-                if (coord.Length >= 2 &&
+                if (coord.Length == 2 &&
                     double.TryParse(coord[0], out double x) &&
                     double.TryParse(coord[1], out double y))
                 {

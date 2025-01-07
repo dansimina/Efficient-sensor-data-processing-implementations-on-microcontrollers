@@ -21,8 +21,8 @@ const float alpha = 0.75;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 6
-#define WAIT2 4
+#define WAIT1 10
+#define WAIT2 8
 #define N 15
 #define PRINT_LEN 15
 
@@ -142,28 +142,30 @@ void computeZScore(float value, int& n, float values[N], float result[N]) {
 
   float mean = 0.0;
   for (int i = 0; i < n; i++) {
-      mean += values[i];
+    mean += values[i];
   }
-  mean /= n;
+  mean = mean / (float)n;
 
   float variance = 0.0;
   for (int i = 0; i < n; i++) {
-      variance += (values[i] - mean) * (values[i] - mean);
+    variance += (values[i] - mean) * (values[i] - mean);
   }
-  variance /= max(n - 1, 1);
+  variance = variance / (float)max(n - 1, 1);
 
   float standardDeviation = sqrt(variance);
 
-  if (n > 1 && standardDeviation != 0) {
-      for (int i = 0; i < n; i++) {
-          result[i] = (values[i] - mean) / standardDeviation;
-      }
-      computeMaxUsedRam();
+  const float EPSILON = 1e-5;
+
+  if (n > 1 && standardDeviation > EPSILON) {
+    for (int i = 0; i < n; i++) {
+      result[i] = (values[i] - mean) / standardDeviation;
+    }
+    computeMaxUsedRam();
   } else {
-      for (int i = 0; i < n; i++) {
-          result[i] = 0;
-      }
-      computeMaxUsedRam();
+    for (int i = 0; i < n; i++) {
+      result[i] = 0;
+    }
+    computeMaxUsedRam();
   }
 
   computeMaxUsedRam();
@@ -211,7 +213,7 @@ void printAngles() {
   angleStr += " ";
   angleStr += String(auxAngleY, 2);
   angleStr += ">#";
-  
+
   Serial.print(angleStr);
 
   computeMaxUsedRam();
