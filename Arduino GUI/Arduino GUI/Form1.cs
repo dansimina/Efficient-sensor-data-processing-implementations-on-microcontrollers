@@ -8,7 +8,6 @@ namespace Arduino_GUI
 {
     public partial class Form1 : Form
     {
-        private readonly object _dataLock = new object();
         private HorizonControl horizonControl;
         private DistanceControl distanceControl;
         private string serialDataIn;
@@ -29,7 +28,7 @@ namespace Arduino_GUI
             InitializeChart(chartZScoreD);
         }
 
-        
+
 
         private void InitializeHorizonControl()
         {
@@ -155,35 +154,82 @@ namespace Arduino_GUI
             }
         }
 
+        private const string START_MARKER = "<";
+        private const string END_MARKER = ">#";
+
         private void serialPort1_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             try
             {
-                // to synchronize UI thread with Data Received thread
-                lock (_dataLock)
+                string newData = serialPort1.ReadExisting();
+                if (string.IsNullOrEmpty(newData))
+                    return;
+
+                auxData += newData;
+
+                int startIndex = auxData.IndexOf(START_MARKER);
+                int endIndex = auxData.IndexOf(END_MARKER);
+
+                while (startIndex != -1 && endIndex != -1 && startIndex < endIndex)
                 {
-                    string newData = serialPort1.ReadExisting();
-                    if (string.IsNullOrEmpty(newData))
-                        return;
+                    string message = auxData.Substring(startIndex + 1, endIndex - startIndex - 1);
+                    ProcessMessage(message);
 
-                    auxData += newData;
-                    if (auxData.Length > 0 && auxData[auxData.Length - 1] == '#')
-                    {
-                        serialDataIn = auxData;
-                        auxData = "";
+                    auxData = auxData.Substring(endIndex + END_MARKER.Length);
 
-                        var parts = serialDataIn.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-                        if (parts.Length == 0)
-                            return;
+                    startIndex = auxData.IndexOf(START_MARKER);
+                    endIndex = auxData.IndexOf(END_MARKER);
+                }
 
-                        String command = parts[0];
-                        ProcessCommand(command);
-                    }
+                if (auxData.Length > 1024)
+                {
+                    auxData = auxData.Substring(auxData.Length - 1024);
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error in data received: {ex.Message}");
+            }
+        }
+
+        private void ProcessMessage(string message)
+        {
+            try
+            {
+                var parts = message.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length < 2) 
+                    return;
+
+                string command = parts[0];
+                serialDataIn = message;
+
+                if (ValidateMessageFormat(command, parts))
+                {
+                    ProcessCommand(command);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error processing message: {ex.Message}");
+            }
+        }
+
+        private bool ValidateMessageFormat(string command, string[] parts)
+        {
+            switch (command)
+            {
+                case "angles":
+                    return parts.Length == 3;
+                case "distance":
+                    return parts.Length == 2;
+                case "zscorex":
+                case "zscorey":
+                case "zscored":
+                    return parts.Length == 16; 
+                case "running_info":
+                    return parts.Length == 3;
+                default:
+                    return false;
             }
         }
 
@@ -318,7 +364,7 @@ namespace Arduino_GUI
             {
                 string[] coord = serialDataIn.Split(' ');
 
-                if (coord.Length >= 3 &&
+                if (coord.Length >= 2 &&
                     double.TryParse(coord[0], out double x) &&
                     double.TryParse(coord[1], out double y))
                 {

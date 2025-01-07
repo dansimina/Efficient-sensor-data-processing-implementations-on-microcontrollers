@@ -21,7 +21,7 @@ const float alpha = 0.75;
 float distance = 0.0;
 
 // PROGRAM
-#define WAIT1 8
+#define WAIT1 6
 #define WAIT2 4
 #define N 15
 #define PRINT_LEN 15
@@ -104,7 +104,7 @@ void computeInfo(int start, int end) {
     if(count == TIME_WINDOW) {
       float averageTime = (float)totalRunningTime / TIME_WINDOW;
 
-      Serial.print("running_info " + String(averageTime) + " " + String(maxUsedRAM) + " #");
+      Serial.print("<running_info " + String(averageTime) + " " + String(maxUsedRAM) + ">#");
       totalRunningTime = 0;
       count = 0;
       maxUsedRAM = 0;
@@ -127,7 +127,7 @@ void computeMaxUsedRam() {
 }
 
 void printZScore(String et, float score[N], int start) {
-  String ZScore = "zscore" + et;
+  String ZScore = "<zscore" + et;
 
   start = (start + N - PRINT_LEN) % N;
   for (int i = 0, j = start; i < PRINT_LEN; i++, j = (j + 1 == N) ? 0 : j + 1) {
@@ -135,7 +135,7 @@ void printZScore(String et, float score[N], int start) {
     ZScore += String(score[j]);
   }
 
-  ZScore += " #";
+  ZScore += ">#";
   Serial.print(ZScore);
   delay(WAIT1);
 
@@ -158,8 +158,9 @@ void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float valu
         values[ptr] = value;
 
         float deltaOld = oldValue - mean;
+        float oldMean = mean;
         mean -= deltaOld / N;
-        M2 -= deltaOld * (oldValue - mean);
+        M2 -= deltaOld * (oldValue - oldMean);
 
         float deltaNew = value - mean;
         mean += deltaNew / N;
@@ -173,28 +174,29 @@ void computeZScoreWelford(float value, int& ptr, int& n, float& mean, float valu
         ptr = 0;
     }
 
-    float standardDeviation = (n > 1) ? sqrt(max(M2 / (n - 1), 0.0f)) : 0.0f;
+    float standardDeviation = sqrt(M2 / (n - 1));
 
-    if (standardDeviation > 0) {
+    if (n > 1 && standardDeviation != 0) {
         for (int i = 0; i < n; i++) {
             result[i] = (values[i] - mean) / standardDeviation;
         }
+        computeMaxUsedRam();
     } else {
         for (int i = 0; i < n; i++) {
             result[i] = 0;
         }
+        computeMaxUsedRam();
     }
 
     computeMaxUsedRam();
 }
 
 void printDistance() {
-  Serial.print("distance ");
-  Serial.print(distance);
-  Serial.print(" #");
+  String distStr = "<distance ";
+  distStr += String(distance, 0);
+  distStr += ">#";
+  Serial.print(distStr);
   delay(WAIT2);
-
-  computeMaxUsedRam();
 }
 
 void initializeHCSR04() {
@@ -221,19 +223,17 @@ void readDistance() {
 }
 
 void printAngles() {
-  float auxAngleX = max(angleX, -89.0);
-  auxAngleX = min(angleX, 89.0);
-  float auxAngleY = max(angleY, -89.0);
-  angleY = min(angleY, 89.0);
+  float auxAngleX = constrain(angleX, -89.0, 89.0);
+  float auxAngleY = constrain(angleY, -89.0, 89.0);
 
-  Serial.print("angles ");
-  Serial.print(auxAngleX);
-  Serial.print(" ");
-  Serial.print(auxAngleY);
-  Serial.print(" #");
+  String angleStr = "<angles ";
+  angleStr += String(auxAngleX, 2);
+  angleStr += " ";
+  angleStr += String(auxAngleY, 2);
+  angleStr += ">#";
+  
+  Serial.print(angleStr);
   delay(WAIT2);
-
-  computeMaxUsedRam();
 }
 
 void initializeMPU6050() {
@@ -304,16 +304,15 @@ void readAngles() {
   computeMaxUsedRam();
 }
 
-// Functie pentru a citi valori de la registrii MPU-6050
 int readMPU6050(unsigned char reg) {
   Wire.beginTransmission(MPU6050_ADDR);
   Wire.write(reg);
   if(Wire.endTransmission(false) != 0) {
-    return 0; // Return 0 if transmission fails
+    return 0;
   }
   
   if(Wire.requestFrom(MPU6050_ADDR, 2, true) != 2) {
-    return 0; // Return 0 if we couldn't get 2 bytes
+    return 0;
   }
 
   computeMaxUsedRam();
