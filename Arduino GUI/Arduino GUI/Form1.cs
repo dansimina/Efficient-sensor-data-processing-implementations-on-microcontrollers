@@ -3,6 +3,8 @@ using System.Windows.Forms;
 using System.IO.Ports;
 using ArtificialHorizon;
 using System.Windows.Forms.DataVisualization.Charting;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Arduino_GUI
 {
@@ -126,14 +128,74 @@ namespace Arduino_GUI
             }
         }
 
-        private void buttonDisconnect_Click(object sender, EventArgs e)
+        private async void buttonDisconnect_Click(object sender, EventArgs e)
         {
-            DisconnectSerialPort();
+            buttonDisconnect.Enabled = false;
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3))) // 3 second timeout
+                    {
+                        try
+                        {
+                            if (serialPort1?.IsOpen == true)
+                            {
+                                // Clear any buffered data
+                                serialPort1.DiscardInBuffer();
+                                serialPort1.DiscardOutBuffer();
+
+                                // Close the port with timeout
+                                Task.Run(() => serialPort1.Close(), cts.Token).Wait(cts.Token);
+                            }
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            // Handle timeout
+                            MessageBox.Show("Port disconnection timed out. The application will force close the connection.",
+                                "Disconnection Warning", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+
+                            // Force close the port
+                            if (serialPort1 != null)
+                            {
+                                serialPort1.Dispose();
+                            }
+                        }
+                    }
+                });
+
+                buttonConnect.Enabled = true;
+                buttonDisconnect.Enabled = false;
+            }
+            catch (Exception error)
+            {
+                MessageBox.Show($"Disconnection error: {error.Message}", "Disconnection Error",
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
 
-        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        private async void Form1_FormClosed(object sender, FormClosedEventArgs e)
         {
-            DisconnectSerialPort();
+            try
+            {
+                await Task.Run(() =>
+                {
+                    using (var cts = new CancellationTokenSource(TimeSpan.FromSeconds(3)))
+                    {
+                        if (serialPort1?.IsOpen == true)
+                        {
+                            serialPort1.DiscardInBuffer();
+                            serialPort1.DiscardOutBuffer();
+                            Task.Run(() => serialPort1.Close(), cts.Token).Wait(cts.Token);
+                        }
+                    }
+                });
+            }
+            catch (Exception)
+            {
+                // Force dispose on form close
+                serialPort1?.Dispose();
+            }
         }
 
         private void DisconnectSerialPort()
