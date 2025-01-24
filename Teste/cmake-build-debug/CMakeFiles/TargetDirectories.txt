@@ -1,3 +1,0 @@
-D:/Documents/Facultate/SSC/Project_SSC/Teste/cmake-build-debug/CMakeFiles/Teste.dir
-D:/Documents/Facultate/SSC/Project_SSC/Teste/cmake-build-debug/CMakeFiles/edit_cache.dir
-D:/Documents/Facultate/SSC/Project_SSC/Teste/cmake-build-debug/CMakeFiles/rebuild_cache.dir
