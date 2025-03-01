@@ -1,17 +1,6 @@
 # 🚀 Microcontroller Sensor Signal Processing
 
 This repository contains a project focused on **efficiently processing sensor data** using a **microcontroller (Arduino UNO)**. The implementation is centered around the **Z-Score calculation algorithm**, progressively optimized using **Welford’s method** and **multitasking simulation**. The project culminates in a **performance comparison** of four different implementations in terms of **execution time and memory usage**. A **Windows Forms (.NET) application** is used for **real-time data visualization**.
-
-## 📂 Folder Structure
-
-- `src/` - **Microcontroller source code and signal processing algorithms**
-- `docs/` - **Project documentation and reports**
-- `hardware/` - **Circuit schematics and wiring diagrams**
-- `windows-app/` - **Windows Forms (.NET) application for real-time data visualization**
-- `tests/` - **Performance analysis and test results**
-
-Each folder contains **relevant scripts, configuration files, and implementation details** for working with the microcontroller and visualization application.
-
 ---
 
 ## 📜 Project Overview
