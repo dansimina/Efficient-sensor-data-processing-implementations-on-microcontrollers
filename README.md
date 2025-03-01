@@ -1,6 +1,7 @@
 # 🚀 Microcontroller Sensor Signal Processing
 
 This repository contains a project focused on **efficiently processing sensor data** using a **microcontroller (Arduino UNO)**. The implementation is centered around the **Z-Score calculation algorithm**, progressively optimized using **Welford’s method** and **multitasking simulation**. The project culminates in a **performance comparison** of four different implementations in terms of **execution time and memory usage**. A **Windows Forms (.NET) application** is used for **real-time data visualization**.
+
 ---
 
 ## 📜 Project Overview
@@ -50,4 +51,11 @@ The project includes detailed **performance benchmarks**, analyzing:
 - **Memory usage comparison** between different processing methods.
 - **Impact of multitasking simulation** on both **time efficiency** and **memory consumption**.
 
+---
 
+## ⚙️ Running the Project
+
+### 1️⃣ Upload the firmware to Arduino:
+```sh
+arduino-cli compile --fqbn arduino:avr:uno src/
+arduino-cli upload -p /dev/ttyUSB0 --fqbn arduino:avr:uno
