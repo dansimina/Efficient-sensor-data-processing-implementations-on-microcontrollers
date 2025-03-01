@@ -1,6 +1,16 @@
 # 🚀 Microcontroller Sensor Signal Processing
 
-This repository contains a project focused on **efficiently processing sensor data** using a **microcontroller (Arduino UNO)**. The implementation optimizes sensor data processing through **real-time filtering, multitasking, and statistical algorithms** to improve performance in **embedded systems**. A **Windows Forms (.NET) application** is used for **data visualization**.
+This repository contains a project focused on **efficiently processing sensor data** using a **microcontroller (Arduino UNO)**. The implementation is centered around the **Z-Score calculation algorithm**, progressively optimized using **Welford’s method** and **multitasking simulation**. The project culminates in a **performance comparison** of four different implementations in terms of **execution time and memory usage**. A **Windows Forms (.NET) application** is used for **real-time data visualization**.
+
+## 📂 Folder Structure
+
+- `src/` - **Microcontroller source code and signal processing algorithms**
+- `docs/` - **Project documentation and reports**
+- `hardware/` - **Circuit schematics and wiring diagrams**
+- `windows-app/` - **Windows Forms (.NET) application for real-time data visualization**
+- `tests/` - **Performance analysis and test results**
+
+Each folder contains **relevant scripts, configuration files, and implementation details** for working with the microcontroller and visualization application.
 
 ---
 
@@ -16,27 +26,39 @@ This repository contains a project focused on **efficiently processing sensor da
 ---
 
 ### 📊 Data Processing Techniques
-The project **acquires, processes, and optimizes** data from sensors using **various algorithms**.
+The project progressively **improves the efficiency of sensor data processing** using multiple techniques.
 
-#### Implemented Features:
-- **Real-time sensor data acquisition** from MPU-6050 and HC-SR04.
-- **Signal filtering**:
-  - Moving Average Filter
-  - Online Variance Computation (Welford’s Algorithm)
-- **Statistical Processing**:
-  - Z-Score normalization for motion analysis.
-- **Task Scheduling & Multitasking**:
-  - Implements an **event-driven task scheduler** to handle multiple sensor readings efficiently.
-- **Data Transmission & Visualization**:
-  - Sends processed data to a **Windows Forms (.NET) application** via serial communication.
-  - Real-time display of **sensor readings, filtering results, and computed statistics**.
+#### Implemented Variants:
+1. **Basic Z-Score Computation**:
+   - Direct computation of Z-Scores for sensor data.
+2. **Optimized Z-Score Computation (Welford’s Algorithm)**:
+   - Uses an **online variance calculation** to improve efficiency.
+3. **Multitasking Simulation for Basic Z-Score**:
+   - Implements a **task scheduler** to handle multiple sensor readings in parallel.
+4. **Multitasking Simulation for Welford’s Algorithm**:
+   - Uses both **task scheduling and online variance computation**.
 
 ---
 
 ### 🏗️ System Implementation
-- **Single-tasking & Multitasking Approaches**:
-  - Initial implementation focused purely on functionality.
-  - Optimized implementation with multitasking and resource management.
-- **Execution Time & Memory Optimization**:
-  - Performance evaluation for **single-tasking vs. multitasking** methods.
-  - Comparison of **Welford’s Algorithm vs. standard moving average** for efficiency.
+Each implementation is tested under **two optimization levels**:
+1. **Single-tasking (basic sequential processing).**
+2. **Multitasking simulation (task scheduling to improve execution speed).**
+
+The project explores:
+- **Execution Time Optimization**:
+  - Welford’s method eliminates the need for iterating over all past values.
+  - Multitasking simulation reduces bottlenecks by running multiple sensor operations in parallel.
+- **Memory Optimization**:
+  - Uses **circular buffers** instead of storing entire datasets.
+  - Optimized floating-point operations reduce memory overhead.
+
+---
+
+## 📌 Performance Analysis
+The project includes detailed **performance benchmarks**, analyzing:
+- **Execution time variations** across all four implementations.
+- **Memory usage comparison** between different processing methods.
+- **Impact of multitasking simulation** on both **time efficiency** and **memory consumption**.
+
+
