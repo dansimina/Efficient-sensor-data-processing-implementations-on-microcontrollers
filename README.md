@@ -50,3 +50,11 @@ The project includes detailed **performance benchmarks**, analyzing:
 - **Execution time variations** across all four implementations.
 - **Memory usage comparison** between different processing methods.
 - **Impact of multitasking simulation** on both **time efficiency** and **memory consumption**.
+
+---
+
+![Photo1](https://github.com/dansimina/Efficient-sensor-data-processing-implementations-on-microcontrollers/blob/main/wiring_diagram.png)
+
+---
+
+![Photo1](https://github.com/dansimina/Efficient-sensor-data-processing-implementations-on-microcontrollers/blob/main/graphical_interface.png)
